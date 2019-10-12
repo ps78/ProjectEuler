@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29324.140
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectEuler", "ProjectEuler\ProjectEuler.csproj", "{52D82935-0D08-444C-A1AD-E514E14ABB12}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NumberTheory", "NumberTheory\NumberTheory.csproj", "{F247ACAB-BB7B-4D85-841F-EE96D5B09AD0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{ECA60838-D02C-4EDD-89CA-84AF130932F6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{52D82935-0D08-444C-A1AD-E514E14ABB12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52D82935-0D08-444C-A1AD-E514E14ABB12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52D82935-0D08-444C-A1AD-E514E14ABB12}.Debug|x64.ActiveCfg = Debug|x64
+		{52D82935-0D08-444C-A1AD-E514E14ABB12}.Debug|x64.Build.0 = Debug|x64
+		{52D82935-0D08-444C-A1AD-E514E14ABB12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52D82935-0D08-444C-A1AD-E514E14ABB12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52D82935-0D08-444C-A1AD-E514E14ABB12}.Release|x64.ActiveCfg = Release|x64
+		{52D82935-0D08-444C-A1AD-E514E14ABB12}.Release|x64.Build.0 = Release|x64
+		{F247ACAB-BB7B-4D85-841F-EE96D5B09AD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F247ACAB-BB7B-4D85-841F-EE96D5B09AD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F247ACAB-BB7B-4D85-841F-EE96D5B09AD0}.Debug|x64.ActiveCfg = Debug|x64
+		{F247ACAB-BB7B-4D85-841F-EE96D5B09AD0}.Debug|x64.Build.0 = Debug|x64
+		{F247ACAB-BB7B-4D85-841F-EE96D5B09AD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F247ACAB-BB7B-4D85-841F-EE96D5B09AD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F247ACAB-BB7B-4D85-841F-EE96D5B09AD0}.Release|x64.ActiveCfg = Release|x64
+		{F247ACAB-BB7B-4D85-841F-EE96D5B09AD0}.Release|x64.Build.0 = Release|x64
+		{ECA60838-D02C-4EDD-89CA-84AF130932F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECA60838-D02C-4EDD-89CA-84AF130932F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECA60838-D02C-4EDD-89CA-84AF130932F6}.Debug|x64.ActiveCfg = Debug|x64
+		{ECA60838-D02C-4EDD-89CA-84AF130932F6}.Debug|x64.Build.0 = Debug|x64
+		{ECA60838-D02C-4EDD-89CA-84AF130932F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECA60838-D02C-4EDD-89CA-84AF130932F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECA60838-D02C-4EDD-89CA-84AF130932F6}.Release|x64.ActiveCfg = Release|x64
+		{ECA60838-D02C-4EDD-89CA-84AF130932F6}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6E3B6DF5-9C40-4911-9207-080C84BE1B7D}
+	EndGlobalSection
+EndGlobal

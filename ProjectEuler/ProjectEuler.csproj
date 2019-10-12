@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <AssemblyName>ProjectEuler</AssemblyName>
+    <RootNamespace>ProjectEuler</RootNamespace>
+    <Platforms>AnyCPU;x64</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NumberTheory\NumberTheory.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="SudokuGame">
+      <HintPath>..\..\..\CSharp\Sudoku\SudokuGame\bin\Release\SudokuGame.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
