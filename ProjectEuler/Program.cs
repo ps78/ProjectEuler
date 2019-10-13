@@ -23,13 +23,11 @@ namespace ProjectEuler
             );
             
             // problems to solve for awards:
-            // - unlucky squares: solve 144, 169
+            // - unlucky squares: solve 169
             // - trinary triumph: solve 243
-            // - fibonacci fever: solve 144, 233
+            // - fibonacci fever: solve 233
 
             pm.Run();
-            
-            Console.ReadKey();
         }
     }
 }
