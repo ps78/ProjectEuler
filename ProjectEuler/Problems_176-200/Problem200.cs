@@ -11,7 +11,7 @@ namespace ProjectEuler
     /// https://projecteuler.net/problem=200
     /// 
     /// We shall define a sqube to be a number of the form, p2q3, where p and q are distinct primes.
-    /// For example, 200 = 5223 or 120072949 = 232613.
+    /// For example, 200 = 5^2*2^3 or 120072949 = 23^2*61^3.
     /// 
     /// The first five squbes are 72, 108, 200, 392, and 500.
     /// 
