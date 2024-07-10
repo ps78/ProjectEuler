@@ -10,33 +10,33 @@ namespace NumberTheory
     /// <summary>
     /// Signature of a heuristic function that returns a lower boundary to the cost of getting from the given node to the target condition
     /// </summary>    
-    public delegate double AStarHeuristicFunction<TNode>(TNode node);
+    public delegate double AStarHeuristicFunction<TNode>(TNode node) where TNode: notnull;
 
     /// <summary>
     /// Signature of function that tests if the given node is a target of the A* search
     /// </summary>
-    public delegate bool AStarIsGoalFunction<TNode>(TNode node);
+    public delegate bool AStarIsGoalFunction<TNode>(TNode node) where TNode : notnull;
 
     /// <summary>
     /// Function that returns the cost of a given path
     /// </summary>
-    public delegate double AStarCostFunction<TNode>(TNode node);
+    public delegate double AStarCostFunction<TNode>(TNode node) where TNode : notnull;
 
     /// <summary>
     /// Returns all neighbors of the given node to be used in the search. Only 'forward-neighbors', not backwards!
     /// Pairs the neighbor node with a relative cost (or distance) to get from node to the neigbor
     /// </summary>
-    public delegate List<(double CostToGetThere, TNode Neighbor)> AStarGetNeighborsFunction<TNode>(TNode node);
+    public delegate List<(double CostToGetThere, TNode Neighbor)> AStarGetNeighborsFunction<TNode>(TNode node) where TNode : notnull;
 
     /// <summary>
     /// A path consisting of nodes of the given type in context of A* search
     /// </summary>
-    public class AStarPath<TNode>
+    public class AStarPath<TNode> where TNode : notnull
     {
         #region Fields
 
-        private readonly List<TNode> nodes = new List<TNode>();        
-        private readonly AStarCostFunction<TNode> costFunction;
+        private readonly List<TNode> nodes = new List<TNode>();
+        private readonly AStarCostFunction<TNode> costFunction = (n) => 0;
 
         #endregion
         #region Properties
@@ -61,7 +61,7 @@ namespace NumberTheory
         {
             this.nodes.AddRange(copyFrom.nodes);
             this.costFunction = copyFrom.costFunction;
-            this.Cost = copyFrom.Cost;            
+            this.Cost = copyFrom.Cost;
         }
 
         public AStarPath(AStarPath<TNode> copyFrom, TNode nodeToAdd) : this(copyFrom)
@@ -101,7 +101,7 @@ namespace NumberTheory
         #endregion
     }
 
-    public class AStarSearch<TNode>
+    public class AStarSearch<TNode> where TNode : notnull
     {
         #region Fields
 

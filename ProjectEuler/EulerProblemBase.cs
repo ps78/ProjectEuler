@@ -18,7 +18,7 @@ namespace ProjectEuler
 
         public bool IsSolved => Solution != 0;
 
-        protected string ResourcePath => @"D:\Daten\Entwicklung\Git\ProjectEuler\ProjectEuler\Resources";
+        protected string ResourcePath => @"D:\Code\ProjectEuler\ProjectEuler\Resources";
 
         protected EulerProblemBase(int problemNumber, string title, long problemSize = 0, long solution = 0)
         {

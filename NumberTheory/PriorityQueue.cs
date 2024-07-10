@@ -147,7 +147,7 @@ namespace NumberTheory
         public bool Contains(T Item)
         {
             foreach (var it in items)
-                if (it.Item.Equals(Item))
+                if (it.Item != null && it.Item.Equals(Item))
                     return true;
             return false;
         }

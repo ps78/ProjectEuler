@@ -36,9 +36,9 @@ namespace ProjectEuler
         {
             var P = BuildSeries();
 
-            bool[] seriesUsed = null;
-            PolyNumber[] intermediateResult = null;
-            List<PolyNumber[]> results = null;
+            bool[]? seriesUsed = null;
+            PolyNumber?[]? intermediateResult = null;
+            List<PolyNumber[]>? results = null;
 
             FindCyclicSeries(P, ref seriesUsed, ref intermediateResult, 0, ref results);
 
@@ -123,18 +123,19 @@ namespace ProjectEuler
             }
         }
 
-        private void FindCyclicSeries(Dictionary<int, PolySeries> series, ref bool[] seriesUsed, ref PolyNumber[] intermediateResult, int numsFixed, ref List<PolyNumber[]> result)
+        private void FindCyclicSeries(Dictionary<int, PolySeries> series, ref bool[]? seriesUsed, ref PolyNumber?[]? intermediateResult, 
+                                      int numsFixed, ref List<PolyNumber[]>? result)
         {
             if (result == null)
                 result = new List<PolyNumber[]>();
             if (seriesUsed == null)
                 seriesUsed = new bool[] { false, false, false, false, false, false, false, false, false };
             if (intermediateResult == null)
-                intermediateResult = new PolyNumber[] { null, null, null, null, null, null };
+                intermediateResult = new PolyNumber?[] { null, null, null, null, null, null };
 
             if (numsFixed == 6)
             {
-                if (intermediateResult[0].StartDigits == intermediateResult[5].EndDigits)
+                if (intermediateResult[0]?.StartDigits == intermediateResult[5]?.EndDigits)
                 {
                     var res = new PolyNumber[6];
                     intermediateResult.CopyTo(res, 0);
@@ -157,7 +158,7 @@ namespace ProjectEuler
                     {
                         var lastNum = intermediateResult[numsFixed - 1];
                         seriesUsed[p] = true;
-                        if (series[p].ByStartDigits.ContainsKey(lastNum.EndDigits))
+                        if (lastNum != null && series[p].ByStartDigits.ContainsKey(lastNum.EndDigits))
                             foreach (var nextNum in series[p].ByStartDigits[lastNum.EndDigits])
                             {
                                 intermediateResult[numsFixed] = nextNum;

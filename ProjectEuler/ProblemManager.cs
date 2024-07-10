@@ -17,9 +17,10 @@ namespace ProjectEuler
         /// Constructor
         /// </summary>
         /// <param name="problemNumbers"></param>
-        public ProblemManager(IEnumerable<int> problemNumbers = null)
+        public ProblemManager(IEnumerable<int>? problemNumbers = null)
         {
-            problems.AddRange(LoadProblems(problemNumbers));
+            if (problemNumbers != null)
+                problems.AddRange(LoadProblems(problemNumbers));
         }
 
         /// <summary>

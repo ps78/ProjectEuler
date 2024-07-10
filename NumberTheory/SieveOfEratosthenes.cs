@@ -14,9 +14,9 @@ namespace NumberTheory
 
         private readonly Byte[] bitPosition;
 
-        private ulong[] sieve;
+        private ulong[] sieve = Array.Empty<ulong>();
 
-        private List<ulong> primeCache = null;
+        private List<ulong> primeCache = [];
         private ulong primeCacheLBound = 0;
         private ulong primeCacheUBound = 0;
                 
@@ -204,7 +204,7 @@ namespace NumberTheory
         /// </summary>
         /// <param name="n"></param>
         /// <returns></returns>
-        public IEnumerable<Tuple<ulong, ulong>> GetPrimeFactors(ulong n, ulong[] primes = null)
+        public IEnumerable<Tuple<ulong, ulong>> GetPrimeFactors(ulong n, ulong[]? primes = null)
         {
             ulong root = (ulong)Math.Sqrt(n);
 
@@ -257,7 +257,7 @@ namespace NumberTheory
         /// <param name="n"></param>
         /// <param name="primes"></param>
         /// <returns></returns>
-        public IEnumerable<ulong> GetFactors(ulong n, ulong[] primes = null)
+        public IEnumerable<ulong> GetFactors(ulong n, ulong[]? primes = null)
         {
             var factors = new List<ulong>();
 

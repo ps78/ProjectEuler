@@ -31,7 +31,7 @@ namespace NumberTheory
         /// 
         /// sieve is an optional prime sieve. If provided, it's upper limit must be >= sqrt(n)
         /// </summary>
-        public static ulong Compute(ulong n, SieveOfEratosthenes sieve = null)
+        public static ulong Compute(ulong n, SieveOfEratosthenes? sieve = null)
         {
             if (n == 1) return 1;
 
@@ -51,7 +51,7 @@ namespace NumberTheory
         /// 
         /// sieve is an optional prime sieve. If provided, it's upper limit must be >= sqrt(n)
         /// </summary>
-        public static ulong ComputeForNonPrimes(ulong n, SieveOfEratosthenes sieve = null)
+        public static ulong ComputeForNonPrimes(ulong n, SieveOfEratosthenes? sieve = null)
         {
             if (n == 1) return 1;
 

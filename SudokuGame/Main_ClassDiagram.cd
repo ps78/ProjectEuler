@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="SudokuGame.Sudoku">
+    <Position X="1" Y="0.75" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <AssociationLine Name="Solution" Type="SudokuGame.Sudoku" ManuallyRouted="true">
+      <Path>
+        <Point X="1.532" Y="0.75" />
+        <Point X="1.532" Y="0.333" />
+        <Point X="1.978" Y="0.333" />
+        <Point X="1.978" Y="0.75" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AIAAAJAAAAAAQQAECEQAAAAAAAAAACAMAAAABBDAEAA=</HashCode>
+      <FileName>Sudoku.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="CharacterSet" />
+      <Property Name="Solution" />
+      <Property Name="State" />
+      <Property Name="Layout" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="SudokuGame.SudokuCharacters" Collapsed="true">
+    <Position X="3.75" Y="0.75" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>gACAEIAAEAAIAAAMCIAAAAYAAAABBABBggAAIIEAECA=</HashCode>
+      <FileName>SudokuCharacters.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SudokuGame.SudokuState">
+    <Position X="6.5" Y="0.5" Width="2.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <AssociationLine Name="Layout" Type="SudokuGame.SudokuLayout" FixedToPoint="true">
+      <Path>
+        <Point X="6.5" Y="4.312" />
+        <Point X="5.25" Y="4.312" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAIAAQAAAQkABAAAKgRBAKAgAQAABoAIABAQCBBAIQA=</HashCode>
+      <FileName>SudokuState.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Layout" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="SudokuGame.SudokuLayout">
+    <Position X="3.75" Y="2.75" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAkAAAAFIAAABKAgBAggAhQAIkAEiCBAAAA=</HashCode>
+      <FileName>SudokuLayout.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SudokuGame.ExcelWriter">
+    <Position X="9.25" Y="0.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAAAEAQAAAAAAAAA=</HashCode>
+      <FileName>ExcelWriter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SudokuGame.Generator">
+    <Position X="9.25" Y="2.25" Width="2.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAAQACAAAAAAAAAAAIAAACAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Generator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

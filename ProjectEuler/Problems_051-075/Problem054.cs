@@ -116,7 +116,7 @@ namespace ProjectEuler
         {
             private Card[] cards = new Card[5];
 
-            private CardValue[] HighestValues = null;
+            private CardValue[]? HighestValues = null;
 
             public PokerHands Hand { get; private set; }
             

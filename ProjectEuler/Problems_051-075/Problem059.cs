@@ -197,7 +197,7 @@ namespace ProjectEuler
             if (maxBytesToRead >= 0)
                 allCipher = allCipher.Take(maxBytesToRead).ToArray();
             
-            return allCipher;            
+            return allCipher;
         }
     
     }

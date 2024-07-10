@@ -8,7 +8,7 @@ namespace NumberTheory
 {
     public static class ListExtensions
     {
-        public static void Shuffle<T>(this List<T> list, Random rand = null)
+        public static void Shuffle<T>(this List<T> list, Random? rand = null)
         {
             if (list == null)
                 return;

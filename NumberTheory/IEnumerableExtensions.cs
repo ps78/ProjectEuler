@@ -19,7 +19,7 @@ namespace NumberTheory
                     sb.Append(separator);
                 else
                     start = false;
-                sb.Append(element.ToString());                
+                sb.Append(element?.ToString());
             }
 
             return sb.ToString();
