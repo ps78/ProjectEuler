@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using NumberTheory;
 using System.IO;
 using System.Numerics;
+using System.Security.Cryptography.X509Certificates;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace ProjectEuler
 {
@@ -35,49 +37,116 @@ namespace ProjectEuler
     {
         public Problem059() : base(59, "XOR decryption", 0, 129448) { }
 
-        private string[] commonWords = new string[] { "the", "The", "and", "who" };
+        private readonly int KeyLength = 3;
+
+        private enum CharacterClass
+        {
+            LetterLowerCase,
+            LetterUpperCase,
+            Number,
+            Space,
+            Punctuation,
+            Other
+        }
+
+        private static CharacterClass ClassifyChar(byte c)
+        {
+            if (c >= 'a' && c <= 'z')
+                return CharacterClass.LetterLowerCase;
+            else if (c >= 'A' && c <= 'Z')
+                return CharacterClass.LetterUpperCase;
+            else if (c >= '0' && c <= '9')
+                return CharacterClass.Number;
+            else if (c == ' ')
+                return CharacterClass.Space;
+            else if (".,:;&%?!()/-'\"".Contains((char)c))
+                return CharacterClass.Punctuation;
+            else
+                return CharacterClass.Other;
+        }
+
+        private static bool IsPlausible(Dictionary<CharacterClass, int> histogram)
+        {
+            double n = histogram.Values.Sum();
+            if (histogram[CharacterClass.Other] / n > 0.1)
+                return false;
+
+            if (histogram[CharacterClass.Punctuation] / n < 0.01 || histogram[CharacterClass.Punctuation] / n > 0.2)
+                return false;
+
+            if (histogram[CharacterClass.Number] / n > 0.1)
+                return false;
+
+            if (histogram[CharacterClass.Space] / n < 0.05 || histogram[CharacterClass.Space]/n > 0.3)
+                return false;
+
+            return true;
+        }
 
         public override long Solve(long n)
         {
-            const double minScore = 0.5;
-
             byte[] cipherText = ReadFile();
 
             int size = cipherText.Length;
 
-            // test all 3 letter keys consisting of lower case letters
-            var solutions = new List<SolutionCondidate>();
-            Parallel.For(97, 128, (k1) =>
+            var histograms = CreateHistograms(cipherText, KeyLength);
+
+            var keyCandidates = new List<byte>[KeyLength];
+
+            for (int keyIdx = 0; keyIdx < KeyLength; keyIdx++)
             {
-                var key = new byte[] { (byte)k1, 0, 0 };
-                for (byte k2 = 97; k2 < 128; k2++)
+                keyCandidates[keyIdx] = new List<byte>();
+                foreach (var kv in histograms[keyIdx])
+                    if (IsPlausible(kv.Value))
+                        keyCandidates[keyIdx].Add(kv.Key);
+
+                if (keyCandidates[keyIdx].Count == 0)
                 {
-                    key[1] = k2;
-                    for (byte k3 = 97; k3 < 128; k3++)
-                    {
-                        key[2] = k3;
-                        byte[] plainText = Xor(cipherText, key);
-                        double score = GetPlaintextScore(plainText);
-                        if (score >= minScore)
-                        {
-                            var sol = new SolutionCondidate(ByteToString(plainText), (byte[])key.Clone(), score);
-                            solutions.Add(sol);
-                            //Console.WriteLine("Score = {0:f2} / Key = {1}", sol.Score, sol.KeyAsString);
-                            //Console.WriteLine(sol.PlainText + "\n");
-                        }
-                    }
+                    Console.WriteLine("No solution found");
+                    return 0;
                 }
-            });
+            }
 
-            solutions.Sort((s1, s2) => s2.Score.CompareTo(s1.Score));
-
-            if (solutions.Count == 0)
+            if (keyCandidates.Select(x => x.Count).Sum() != KeyLength)
             {
-                Console.WriteLine("no solution found");
+                Console.WriteLine("More than one solution found");
                 return 0;
             }
-            else
-                return solutions.First().LetterSum;
+
+            var key = keyCandidates.Select(x => x.First()).ToArray();
+
+            byte[] plainText = Xor(cipherText, key);
+            var sol = new SolutionCondidate(ByteToString(plainText), key, 1.0);
+
+            return sol.LetterSum;
+        }
+
+        private Dictionary<byte, Dictionary<CharacterClass,int>>[] CreateHistograms(byte[] cipherText, int keyLength)
+        {
+            var histogramArray = new Dictionary<byte, Dictionary<CharacterClass, int>>[keyLength];
+
+            for (int keyIndex = 0; keyIndex < keyLength; keyIndex++)
+            {                
+                var keyHistograms = new Dictionary<byte, Dictionary<CharacterClass, int>>();
+
+                for (byte keyChar = (byte)'a'; keyChar <= (byte)'z'; keyChar++)
+                {
+                    var histogram = new Dictionary<CharacterClass, int>();
+                    foreach (var val in Enum.GetValues(typeof(CharacterClass)))
+                        histogram[(CharacterClass)val] = 0;
+
+                    for (int idx = keyIndex; idx < cipherText.Length; idx += keyLength)
+                    {
+                        var chClass = ClassifyChar((byte)(cipherText[idx] ^ keyChar));
+                        histogram[chClass]++;
+                    }
+
+                    keyHistograms[keyChar] = histogram;
+                }
+                histogramArray[keyIndex] = keyHistograms;
+            }
+
+            return histogramArray;
         }
 
 
@@ -114,7 +183,7 @@ namespace ProjectEuler
         /// <param name="input1"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        private byte[] Xor(byte[] input1, byte[] key)
+        private static byte[] Xor(byte[] input1, byte[] key)
         {
             int keyLen = key.Length, keyIdx = 0; 
             var result = new byte[input1.Length];
@@ -133,7 +202,7 @@ namespace ProjectEuler
         /// <param name="key"></param>
         /// <param name="length"></param>
         /// <returns></returns>
-        private byte[] GenerateFullKey(byte[] key, int length)
+        private static byte[] GenerateFullKey(byte[] key, int length)
         {
             var result = new byte[length];
             int keySize = key.Length;
@@ -144,49 +213,12 @@ namespace ProjectEuler
             return result;
         }
 
-        private string ByteToString(byte[] input)
+        private static string ByteToString(byte[] input)
         {
             var sb = new StringBuilder();
             foreach (byte b in input)
                 sb.Append((char)b);
             return sb.ToString();
-        }
-
-        /// <summary>
-        /// checks if the input is an english plain text
-        /// </summary>
-        /// <param name="candidate"></param>
-        /// <returns></returns>
-        private double GetPlaintextScore(byte[] candidate)
-        {
-            //int numOfSpaces = candidate.Count((b) => b == 32);
-            //int numLowerCaseChars = candidate.Count((b) => (b >= 97) && (b <= 127));
-            //int numUpperCaseChars = candidate.Count((b) => (b >= 65) && (b <= 90));
-
-            double s = candidate.Length;
-            //if ((numOfSpaces / s > 0.05) && (numLowerCaseChars > 0.6) && (numUpperCaseChars > 0.01))
-            //    if (CountWords(candidate, "and") >= 3)
-            //        return true;                       
-
-            double freqSpace = candidate.Count((b) => b == 32) / s;
-            double freqE = candidate.Count((b) => (b == 101 || b == 69)) / s; // 0.127
-            //double freqT = candidate.Count((b) => (b == 116 || b == 84)) / s; // 0.091
-            //double freqA = candidate.Count((b) => (b == 97 || b == 65)) / s;  // 0.082
-            //double freqO = candidate.Count((b) => (b == 111 || b == 79)) / s; // 0.075
-            //double freqI = candidate.Count((b) => (b == 105 || b == 73)) / s; // 0.070
-            double freqSpecChar = candidate.Count((b) => (b < 32 || b > 122)) / s;
-            if (
-                ((freqSpecChar < 0.01)) &&
-                ((freqE >= 0.08) && (freqE <= 0.16)) &&
-                //((freqT >= 0.05) && (freqT <= 0.15)) &&
-                //((freqA >= 0.03) && (freqA <= 0.14)) &&
-                //((freqO >= 0.03) && (freqO <= 0.12)) &&
-                //((freqI >= 0.03) && (freqI <= 0.12)) &&
-                ((freqSpace >= 0.15) && (freqSpace <= 0.25))
-               )
-                return 1.0;
-
-            return 0.0;
         }
 
         private byte[] ReadFile(int maxBytesToRead = -1)

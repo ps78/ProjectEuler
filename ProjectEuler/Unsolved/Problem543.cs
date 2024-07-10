@@ -26,7 +26,7 @@ namespace ProjectEuler
             long sum = 0;
             for (long fib = 3; fib < n; fib++)
                 sum += S(fib);
-            return sum;            
+            return sum;
         }
 
         private long MaxNumber;

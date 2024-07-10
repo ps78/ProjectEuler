@@ -17,7 +17,6 @@ namespace ProjectEuler
                 // all solved problems
                 Enumerable.Range(1, 100)
                 .Union(new[] { 101, 121, 144, 146, 148, 200, 307 })
-
                 // unsolved problems
                 //.Append(543) 
             );
