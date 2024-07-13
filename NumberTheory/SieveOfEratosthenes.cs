@@ -14,7 +14,7 @@ namespace NumberTheory
 
         private readonly Byte[] bitPosition;
 
-        private ulong[] sieve = Array.Empty<ulong>();
+        private ulong[] sieve = [];
 
         private List<ulong> primeCache = [];
         private ulong primeCacheLBound = 0;
@@ -85,7 +85,7 @@ namespace NumberTheory
         public SieveOfEratosthenes(ulong limit)
         {
             if (limit < 30)
-                limit = 30;                
+                limit = 30;
 
             this.Limit = limit;
 
@@ -217,7 +217,7 @@ namespace NumberTheory
             }
 
             ulong remainder = n;
-            for (int i = 0; i < primes.Length; i++)            
+            for (int i = 0; i < primes.Length; i++)
             {
                 ulong p = primes[i];
                 if (p > root)
