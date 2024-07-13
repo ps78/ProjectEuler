@@ -35,5 +35,39 @@ namespace NumberTheory
             var otherChars = otherString.ToCharArray().OrderBy((c) => c);
             return thisChars.SequenceEqual(otherChars);
         }
+
+        public static string? Reverse(this string? s)
+        {
+            if (s == null)
+                return null;
+
+            char[] charArray = s.ToCharArray();
+            Array.Reverse(charArray);
+            return new string(charArray);
+        }
+
+        /// <summary>
+        /// Returns all indices of otherString withing s
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="otherString"></param>
+        /// <returns></returns>
+        public static int[] IndicesOf(this string? s, string? otherString)
+        {
+            if (s == null || otherString == null)
+                return [];
+             
+            var result = new List<int>();
+            int index = -1;
+            do
+            {
+                index = s.IndexOf(otherString, index + 1);
+                if (index >= 0)
+                    result.Add(index);
+            }
+            while (index >= 0);
+
+            return result.ToArray();
+        }
     }
 }

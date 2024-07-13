@@ -77,7 +77,7 @@ namespace ProjectEuler
             double totalRunTime = 0;
             int testsFailed = 0;
             int wrongSolutions = 0;
-            IEulerProblem slowestProblem = null;
+            IEulerProblem? slowestProblem = null;
             TimeSpan longestRuntime = TimeSpan.Zero;
 
             Console.WriteLine("=======================================");
@@ -100,7 +100,7 @@ namespace ProjectEuler
 
                 // solve
                 sw.Restart();
-                var solution = (long)p.Solve(p.ProblemSize);                
+                var solution = (long)p.Solve(p.ProblemSize);
                 var runtime = sw.Elapsed;
                 totalRunTime += runtime.TotalMilliseconds;
 
@@ -111,7 +111,7 @@ namespace ProjectEuler
                 if (runtime.TotalMilliseconds > 1000)
                     Console.Write("SLOW!! ");
 
-                if (slowestProblem == null || runtime > longestRuntime)
+                if (slowestProblem == null || runtime >= longestRuntime)
                 {
                     longestRuntime = runtime;
                     slowestProblem = p;

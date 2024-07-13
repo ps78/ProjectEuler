@@ -16,13 +16,12 @@ namespace ProjectEuler
             var pm = new ProblemManager(
                 // all solved problems
                 Enumerable.Range(1, 100)
-                .Union(new[] { 101, 121, 144, 146, 148, 200, 307 })
+                .Union(new[] { 101, 121, 144, 146, 148, 169, 200, 307 })
                 // unsolved problems
                 //.Append(543) 
             );
             
             // problems to solve for awards:
-            // - unlucky squares: solve 169
             // - trinary triumph: solve 243
             // - fibonacci fever: solve 233
 

@@ -221,16 +221,28 @@ namespace NumberTheory
         /// <param name="n"></param>
         /// <param name="bas"></param>
         /// <returns></returns>
-        public static string ToBase(this long n, long bas)
+        public static string ToBase(this long n, int bas)
         {
-            char[] digits = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
-            string result = "";
+            char[] digits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+            var sb = new StringBuilder();
             while (n > 0)
             {
-                result += digits[n % bas];
+                sb.Insert(0, digits[n % bas]);
                 n /= bas;
             }
-            return result;
+            return sb.ToString();
+        }
+
+        public static string ToBase(this BigInteger n, int bas)
+        {
+            char[] digits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };            
+            var sb = new StringBuilder();
+            while (n > 0)
+            {
+                sb.Insert(0, digits[(int)(n % bas)]);
+                n /= bas;
+            }
+            return sb.ToString();
         }
 
         #endregion
