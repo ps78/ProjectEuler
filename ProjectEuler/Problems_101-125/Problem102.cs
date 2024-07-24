@@ -40,11 +40,11 @@ namespace ProjectEuler
             public int Y;
         }
 
-        public Problem102() : base(102, "Triangle Containment", 0, 0) { }
+        public Problem102() : base(102, "Triangle Containment", 0, 228) { }
 
         public override long Solve(long n)
         {
-            var lines = File.ReadAllLines("..\\..\\..\\Resources\\Problem102.txt");
+            var lines = File.ReadAllLines(Path.Combine(ResourcePath, "problem102.txt"));
         
             int containsOrigin = 0;
             var P = new Point() { X = 0, Y = 0 };

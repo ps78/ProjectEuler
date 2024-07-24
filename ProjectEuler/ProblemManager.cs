@@ -19,8 +19,7 @@ namespace ProjectEuler
         /// <param name="problemNumbers"></param>
         public ProblemManager(IEnumerable<int>? problemNumbers = null)
         {
-            if (problemNumbers != null)
-                problems.AddRange(LoadProblems(problemNumbers));
+            problems.AddRange(LoadProblems(problemNumbers));
         }
 
         /// <summary>
@@ -29,10 +28,10 @@ namespace ProjectEuler
         /// Numbers that don't exist are simply not loaded
         /// </summary>
         /// <param name="problemNumbers"></param>
-        private IEnumerable<IEulerProblem> LoadProblems(IEnumerable<int> problemNumbers = null)
+        private IEnumerable<IEulerProblem> LoadProblems(IEnumerable<int>? problemNumbers = null)
         {
             // get the types through Reflection:
-            List<Type> types = new List<Type>();
+            List<Type> types = [];
 
             // get all types:
             if (problemNumbers == null)
@@ -51,7 +50,7 @@ namespace ProjectEuler
                     string typeName = $"ProjectEuler.Problem{n:000}, ProjectEuler, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
                     var type = Type.GetType(typeName);
                     if (type != null)
-                        types.Add(type);                    
+                        types.Add(type);
                 }
             }
 

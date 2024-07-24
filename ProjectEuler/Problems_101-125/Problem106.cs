@@ -40,7 +40,7 @@ namespace ProjectEuler
     /// </summary>
     public class Problem106 : EulerProblemBase
     {
-        public Problem106() : base(106, "Special Subset Sums: Meta-testing", 12, 0) { }
+        public Problem106() : base(106, "Special Subset Sums: Meta-testing", 12, 21384) { }
 
         public override bool Test() => Solve(4) == 1 && Solve(7) == 70;
 
