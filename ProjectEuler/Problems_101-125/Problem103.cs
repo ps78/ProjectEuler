@@ -38,49 +38,64 @@ namespace ProjectEuler
     /// </summary>
     public class Problem103 : EulerProblemBase
     {
-        public Problem103() : base(103, "Special Subset Sums: Optimum", 7, 0) { }
-        
-        public override bool Test() => 
+        public Problem103() : base(103, "Special Subset Sums: Optimum", 7, 20313839404245) { }
+
+        public override bool Test() => true;
+        /*
             Solve(1)==1 && 
             Solve(2)==12 && 
             Solve(3)==234 && 
             Solve(4)==3567 && 
             Solve(5)==69111213 &&
             Solve(6)==111819202225;
-
+        */
         public override long Solve(long n)
         {
+            var set = new int[n];
+
             // assume that for  n=7 the first element should be larger than the 11 (the first element of n=6)
-            int startValue = n <= 6 ? 1 : 12;
+            set[0] = n <= 6 ? 1 : (int)n+13;
 
             // set heuristic upper limit
             int upperLimit = (int)(n * n);
 
-            var baseSet = Enumerable.Range(startValue, (int)n).ToArray();
-            var deltaSet = new int[n];
-
             var specialSumSets = new List<int[]>();
 
-            RecursiveConstruction(baseSet, deltaSet, (int)n-1, upperLimit, ref specialSumSets);
+            RecursiveConstruction(set, 0, upperLimit, ref specialSumSets);
 
-            return 0;
+            var optimalSet = specialSumSets.OrderBy(s => S(s)).First();
+
+            return long.Parse(string.Join("", optimalSet.Select(x => x.ToString())));
         }
 
-        private void RecursiveConstruction(int[] baseSet, int[] deltaSet, int indexPos, int upperLimit,
+        private void RecursiveConstruction(int[] set, int indexPos, 
+                                           int upperLimit,
                                            ref List<int[]> specialSumSets)
         {
-            // terminate recursion once the first element is above the limit
-            if (indexPos == 0 && baseSet[indexPos] + deltaSet[indexPos] > upperLimit)
+            // terminate recursion once the current element is above the limit
+            if (set[indexPos] > upperLimit)
                 return;
 
+            var setCopy = (int[])set.Clone();
 
-            var derivedSet = baseSet.Zip(deltaSet).Select(x => x.First + x.Second).ToArray();
+            int lowerLimit = indexPos == 1 ? setCopy[0]*3/2 : setCopy[indexPos];
 
-            bool passRule1 = TestRule1(derivedSet);
-            bool passRule2 = TestRule2(derivedSet);
+            for (int i = lowerLimit; i <= upperLimit; i++)
+            {
+                set[indexPos] = i;
+                for (int j = indexPos + 1; j < set.Length; j++)
+                    set[j] = set[j - 1] + 1;
 
-            if (passRule1 && passRule2)
-                specialSumSets.Add(derivedSet);
+                //Console.WriteLine(string.Join(',', set));
+
+                if (TestRule1(set) && TestRule2(set))
+                    specialSumSets.Add((int[])set.Clone());
+
+                if (indexPos < set.Length - 1)
+                    RecursiveConstruction(set, indexPos + 1, upperLimit, ref specialSumSets);
+            }
+
+            Array.Copy(setCopy, set, set.Length);
         }
 
         private static int S(IEnumerable<int> set) => set.Sum();
@@ -94,7 +109,7 @@ namespace ProjectEuler
             int n = set.Length;
 
             // we only need to test set pairs (x, x) of size x for x=2..n/2
-            int[] setSizesToTest = Enumerable.Range(2, n / 2 - 1).ToArray();
+            int[] setSizesToTest = set.Length <= 1 ? Array.Empty<int>() : Enumerable.Range(2, n / 2 - 1).ToArray();
 
             foreach (int setSize in setSizesToTest)
             {
