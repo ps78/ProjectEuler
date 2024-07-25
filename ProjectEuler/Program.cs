@@ -15,8 +15,8 @@ namespace ProjectEuler
 
             var pm = new ProblemManager(
                 // all solved problems
-                //Enumerable.Range(1, 102).Union(new[] { 106, 121, 126, 144, 146, 148, 169, 200, 243, 307 })
-                new[] {105}
+                Enumerable.Range(1, 102).Union(new[] { 105, 106, 121, 126, 144, 146, 148, 169, 200, 243, 307 })
+                //new[] {105}
                 // unsolved problems
                 //.Append(543) 
             );
