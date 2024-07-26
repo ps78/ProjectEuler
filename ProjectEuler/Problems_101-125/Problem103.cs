@@ -40,15 +40,12 @@ namespace ProjectEuler
     {
         public Problem103() : base(103, "Special Subset Sums: Optimum", 7, 20313839404245) { }
 
-        public override bool Test() => true;
-        /*
-            Solve(1)==1 && 
-            Solve(2)==12 && 
+        public override bool Test() => 
             Solve(3)==234 && 
             Solve(4)==3567 && 
             Solve(5)==69111213 &&
             Solve(6)==111819202225;
-        */
+        
         public override long Solve(long n)
         {
             var set = new int[n];
@@ -65,7 +62,9 @@ namespace ProjectEuler
 
             var optimalSet = specialSumSets.OrderBy(s => S(s)).First();
 
-            return long.Parse(string.Join("", optimalSet.Select(x => x.ToString())));
+            long result = long.Parse(string.Join("", optimalSet.Select(x => x.ToString())));
+
+            return result;
         }
 
         private void RecursiveConstruction(int[] set, int indexPos, 
