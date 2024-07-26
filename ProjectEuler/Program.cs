@@ -5,26 +5,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectEuler
+namespace ProjectEuler;
+
+class Program
 {
-    class Program
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
-        {
-            Console.OutputEncoding = Encoding.Unicode;
+        Console.OutputEncoding = Encoding.Unicode;
 
-            var pm = new ProblemManager(
-                // all solved problems
-                //Enumerable.Range(1, 103).Union(new[] { 105, 106, 121, 126, 144, 146, 148, 169, 200, 243, 307 })
-                new[] { 104 }
-                // unsolved problems
-                //.Append(543) 
-            );
-            
-            // problems to solve for awards:
-            // - fibonacci fever: solve 233
+        var pm = new ProblemManager(
+            // all solved problems
+            //Enumerable.Range(1, 103).Union(new[] { 105, 106, 121, 126, 144, 146, 148, 169, 200, 243, 307 })
+            new[] { 104 }
+            // unsolved problems
+            //.Append(543) 
+        );
+        
+        // problems to solve for awards:
+        // - fibonacci fever: solve 233
 
-            pm.Run();
-        }
+        pm.Run();
     }
 }

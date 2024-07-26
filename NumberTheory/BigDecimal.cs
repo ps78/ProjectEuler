@@ -12,20 +12,22 @@ namespace NumberTheory;
 public readonly struct BigDecimal : IEquatable<BigDecimal>, IComparable<BigDecimal>
 {
     public readonly bool Sign;
-    public readonly double Mantissa;
+    public readonly decimal Mantissa;
     public readonly int Exponent;
 
-    public double SignedMantissa => Sign ? Mantissa : -Mantissa;
+    public decimal SignedMantissa => Sign ? Mantissa : -Mantissa;
+
+    public static BigDecimal Zero => new(true, 0, 0);
 
     #region Constructors
 
-    public BigDecimal(double d) : this(true, d, 0) { }
+    public BigDecimal(decimal d) : this(true, d, 0) { }
     
-    public BigDecimal(double mantissa, int exponent) : this(true, mantissa, exponent) { }
+    public BigDecimal(decimal mantissa, int exponent) : this(true, mantissa, exponent) { }
     
-    public BigDecimal(bool sign, double mantissa, int exponent)
+    public BigDecimal(bool sign, decimal mantissa, int exponent)
     {
-        (bool s, double m, int e) = Normalize(mantissa, exponent);
+        (bool s, decimal m, int e) = Normalize(mantissa, exponent);
         
         Sign = sign ^ !s;
         Mantissa = m;
@@ -35,20 +37,25 @@ public readonly struct BigDecimal : IEquatable<BigDecimal>, IComparable<BigDecim
     #endregion
     #region private Methods
 
-    private static (bool sign, double mantissa, int exponent) Normalize(double m, int e)
+    private static (bool sign, decimal mantissa, int exponent) Normalize(decimal m, int e)
     {
-        bool sign = m >= 0;
-        double mantissa = Math.Abs(m);
-        int exponent = e;
-        if (mantissa < 1 || mantissa >= 10)
+        if (m == 0)
+            return (true, 0, 0);
+        else
         {
-            int log10 = (int)Math.Floor(Math.Log10(mantissa));
-            double exp10 = Math.Pow(10, log10);
+            bool sign = m >= 0;
+            decimal mantissa = Math.Abs(m);
+            int exponent = e;
+            if (mantissa < 1 || mantissa >= 10)
+            {
+                int log10 = (int)Math.Floor(Math.Log10((double)mantissa));
+                decimal exp10 = (decimal)Math.Pow(10, log10);
 
-            mantissa /= exp10;
-            exponent += log10;
+                mantissa /= exp10;
+                exponent += log10;
+            }
+            return (sign, mantissa, exponent);
         }
-        return (sign, mantissa, exponent);
     }
 
     #endregion
@@ -62,8 +69,13 @@ public readonly struct BigDecimal : IEquatable<BigDecimal>, IComparable<BigDecim
 
     public override string ToString() => ToString(null);
 
-    public bool Equals(BigDecimal other) =>
-        Sign == other.Sign && Mantissa == other.Mantissa && Exponent == other.Exponent;
+    public bool Equals(BigDecimal other)
+    {
+        if (Mantissa == 0 && other.Mantissa == 0)
+            return true;
+        else
+            return Sign == other.Sign && Mantissa == other.Mantissa && Exponent == other.Exponent;
+    }
 
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
@@ -108,46 +120,63 @@ public readonly struct BigDecimal : IEquatable<BigDecimal>, IComparable<BigDecim
 
     public static BigDecimal operator^ (BigDecimal a, int n)
     {
-        double m = a.Mantissa;
-        int exp = a.Exponent;
-        bool s = a.Sign;
-
-        // square m as long as possible
-        int k = 1;
-        while (2 * k <= n)
+        if (n == 0)
         {
-            m *= m;
-            (_, m, int exp2) = Normalize(m, exp);
-            exp = 2*exp + exp2;
-            k *= 2;
-            s = true;
+            if (a.Equals(0))
+                throw new ArithmeticException("Attempted to calculate 0^0");
+            else
+                return BigDecimal.Zero;
         }
-        
-        // now calculated a^(2^i) with 2^i <= n
-        // what remains is the exponent n-2^i
-        for (int _ = k; _ < n; _++)
+        else if (n == 1)
         {
-            m *= a.Mantissa;
-            exp += a.Exponent;
-            if (!a.Sign) s = !s;
-            (bool s2, m, int exp2) = Normalize(m, exp);
-            exp = exp2;
+            return a;
         }
+        else if (n < 0)
+        {
+            throw new NotImplementedException("Negative exponents are not implemented yet");
+        }
+        else
+        {
+            decimal m = a.Mantissa;
+            int exp = a.Exponent;
+            bool s = a.Sign;
 
-        return new BigDecimal(s, m, exp);
+            // square m as long as possible
+            int k = 1;
+            while (2 * k <= n)
+            {
+                m *= m;
+                (_, m, exp) = Normalize(m, 2 * exp);
+                k *= 2;
+                s = true;
+            }
+
+            // now calculated a^(2^i) with 2^i <= n
+            // what remains is the exponent n-2^i
+            for (int _ = k; _ < n; _++)
+            {
+                m *= a.Mantissa;
+                exp += a.Exponent;
+                if (!a.Sign) s = !s;
+                (bool s2, m, exp) = Normalize(m, exp);
+            }
+
+            return new(s, m, exp);
+        }
     }
 
     public static BigDecimal operator *(BigDecimal a, BigDecimal b)
-        => new BigDecimal(a.Sign == b.Sign, a.Mantissa * b.Mantissa, a.Exponent + b.Exponent);
+        => new (a.Sign == b.Sign, a.Mantissa * b.Mantissa, a.Exponent + b.Exponent);
 
-    public static BigDecimal operator *(BigDecimal a, double d)
-        => new BigDecimal(a.Sign, a.Mantissa * d, a.Exponent);
+    public static BigDecimal operator *(BigDecimal a, decimal d)
+        => new (a.Sign, a.Mantissa * d, a.Exponent);
 
-    public static BigDecimal operator *(double d, BigDecimal a) => a * d; 
+    public static BigDecimal operator *(decimal d, BigDecimal a) => a * d; 
 
-    // Conversions to/from double
-    public static explicit operator BigDecimal(double d) => new BigDecimal(d);
-    public static explicit operator double(BigDecimal d) => (d.Sign ? 1 : -1) * d.Mantissa * Math.Pow(10, d.Exponent);
+    // Conversions to/from decimal
+    public static explicit operator BigDecimal(decimal d) => new (d);
+    public static explicit operator decimal(BigDecimal d) 
+        => (d.Sign ? 1 : -1) * d.Mantissa * (decimal)Math.Pow(10, d.Exponent);
 
     #endregion
 }
