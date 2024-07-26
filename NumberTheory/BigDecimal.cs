@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Numerics;
 using System.Reflection.Metadata;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace NumberTheory;
 
-public readonly struct BigDecimal
+public readonly struct BigDecimal : IEquatable<BigDecimal>, IComparable<BigDecimal>
 {
     public readonly bool Sign;
     public readonly double Mantissa;
@@ -55,13 +56,50 @@ public readonly struct BigDecimal
 
     public string ToString(string? format)
     {
-        string s = Sign ? "" : "-";
-        s += format == null ? Mantissa.ToString() : Mantissa.ToString(format);
-        s += $"E{Exponent}";
-        return s;
+        return (format == null ? SignedMantissa.ToString() : SignedMantissa.ToString(format))
+                + $"E{Exponent}";
     }
 
     public override string ToString() => ToString(null);
+
+    public bool Equals(BigDecimal other) =>
+        Sign == other.Sign && Mantissa == other.Mantissa && Exponent == other.Exponent;
+
+    public override bool Equals([NotNullWhen(true)] object? obj)
+    {
+        if (obj is BigDecimal dec)
+            return Equals(dec);
+        else
+            return false;
+    }
+
+    public override int GetHashCode() =>
+        Sign.GetHashCode() ^ Mantissa.GetHashCode() ^ Exponent.GetHashCode();
+
+    public int CompareTo(BigDecimal other)
+    {
+        if (Equals(other)) 
+            return 0;
+        else if (Sign != other.Sign)
+            return Sign ? 1 : -1;
+        else
+        {
+            if (Exponent == other.Exponent)
+            {
+                if (Sign)
+                    return Mantissa > other.Mantissa ? 1 : -1;
+                else
+                    return Mantissa > other.Mantissa ? -1 : 1;
+            }
+            else
+            {
+                if (Sign)
+                    return Exponent > other.Exponent ? 1 : -1;
+                else
+                    return Exponent > other.Exponent ? -1 : 1;
+            }
+        }
+    }
 
     public static BigDecimal operator+ (BigDecimal a, BigDecimal b)
     {
@@ -72,28 +110,40 @@ public readonly struct BigDecimal
     {
         double m = a.Mantissa;
         int exp = a.Exponent;
+        bool s = a.Sign;
 
         // square m as long as possible
-        int k = 0;
+        int k = 1;
         while (2 * k <= n)
         {
             m *= m;
             (_, m, int exp2) = Normalize(m, exp);
             exp = 2*exp + exp2;
             k *= 2;
+            s = true;
         }
-
+        
         // now calculated a^(2^i) with 2^i <= n
         // what remains is the exponent n-2^i
-        for (int _ = exp; _ < n; _++)
+        for (int _ = k; _ < n; _++)
         {
             m *= a.Mantissa;
-            (bool s, m, int exp2) = Normalize(m, exp);
-            exp = exp + a.Exponent + exp2;
+            exp += a.Exponent;
+            if (!a.Sign) s = !s;
+            (bool s2, m, int exp2) = Normalize(m, exp);
+            exp = exp2;
         }
 
-        return new BigDecimal(m, exp);
+        return new BigDecimal(s, m, exp);
     }
+
+    public static BigDecimal operator *(BigDecimal a, BigDecimal b)
+        => new BigDecimal(a.Sign == b.Sign, a.Mantissa * b.Mantissa, a.Exponent + b.Exponent);
+
+    public static BigDecimal operator *(BigDecimal a, double d)
+        => new BigDecimal(a.Sign, a.Mantissa * d, a.Exponent);
+
+    public static BigDecimal operator *(double d, BigDecimal a) => a * d; 
 
     // Conversions to/from double
     public static explicit operator BigDecimal(double d) => new BigDecimal(d);
