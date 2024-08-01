@@ -95,6 +95,7 @@ public class BigDecimal_UnitTests
     }
 
     [Theory(DisplayName = "BigDecimal: Operator BigDecimal^int")]
+    [InlineData(false, 5, 0, 21, false, 4.76837158203125, 14)]
     [InlineData(true, 2, 0, 5, true, 3.2, 1)]
     [InlineData(false, 7, 0, 2, true, 4.9, 1)]
     [InlineData(true, -0.3, 0, 7, true, -0.0002187,0)]
@@ -123,7 +124,7 @@ public class BigDecimal_UnitTests
     [Theory(DisplayName = "BigDecimal: Operator BigDecimal*Double")]
     [InlineData(true, 2, 3, 70.0, true, 140000, 0)]
     [InlineData(false, 77, -5, 130.0, false, 0.1001, 0)]
-    public void TestOperatorMultiplyDouble(
+    public void TestOperatorMultiplyDecimal(
         bool a_sign, decimal a_m, int a_exp,
         decimal b,
         bool c_sign, decimal c_m, int c_exp)
@@ -133,5 +134,27 @@ public class BigDecimal_UnitTests
 
         (a * b).Should().Be(c);
         (b * a).Should().Be(c);
+    }
+
+    [Theory(DisplayName = "BigDecimal: Operator Minus")]
+    [InlineData(true, 3.3, 4, true, 1.1, 4, true, 2.2, 4)]
+    [InlineData(false, 3.3, 4, true, 1.1, 4, false, 4.4, 4)]
+    [InlineData(false, 3.3, 4, false, 1.1, 4, false, 2.2, 4)]
+    [InlineData(true, 3.3, 4, false, 1.1, 4, true, 4.4, 4)]
+    [InlineData(true, 33000, 0, true, 11, 0, true, 32989, 0)]
+    [InlineData(true, 33000, 0, false, 11, 0, true, 33011, 0)]
+    [InlineData(false, 33000, 0, true, 11, 0, false, 33011, 0)]
+    [InlineData(false, 33000, 0, false, 11, 0, false, 32989, 0)]
+    [InlineData(false, 11, 0, false, 33000, 0, true, 32989, 0)]
+    [InlineData(true, 0.53, 0, true, 32.6, 0, false, 32.07, 0)]
+    public void TestOperatorMinus(bool a_sign, decimal a_m, int a_exp,
+                                  bool b_sign, decimal b_m, int b_exp,
+                                  bool c_sign, decimal c_m, int c_exp)
+    {
+        var a = new BigDecimal(a_sign, a_m, a_exp);
+        var b = new BigDecimal(b_sign, b_m, b_exp);
+        var c = new BigDecimal(c_sign, c_m, c_exp);
+
+        (a - b).Should().Be(c);
     }
 }

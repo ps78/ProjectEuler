@@ -15,8 +15,7 @@ class Program
 
         var pm = new ProblemManager(
             // all solved problems
-            //Enumerable.Range(1, 103).Union(new[] { 105, 106, 121, 126, 144, 146, 148, 169, 200, 243, 307 })
-            new[] { 104 }
+            Enumerable.Range(1, 106).Union([121, 126, 144, 146, 148, 169, 200, 243, 307])
             // unsolved problems
             //.Append(543) 
         );

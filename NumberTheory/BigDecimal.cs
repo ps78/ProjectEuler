@@ -19,6 +19,8 @@ public readonly struct BigDecimal : IEquatable<BigDecimal>, IComparable<BigDecim
 
     public static BigDecimal Zero => new(true, 0, 0);
 
+    public static BigDecimal One => new(true, 1, 0);
+
     #region Constructors
 
     public BigDecimal(decimal d) : this(true, d, 0) { }
@@ -120,6 +122,7 @@ public readonly struct BigDecimal : IEquatable<BigDecimal>, IComparable<BigDecim
 
     public static BigDecimal operator^ (BigDecimal a, int n)
     {
+
         if (n == 0)
         {
             if (a.Equals(0))
@@ -137,31 +140,26 @@ public readonly struct BigDecimal : IEquatable<BigDecimal>, IComparable<BigDecim
         }
         else
         {
-            decimal m = a.Mantissa;
+            decimal m = Math.Abs(a.Mantissa);
             int exp = a.Exponent;
-            bool s = a.Sign;
 
-            // square m as long as possible
-            int k = 1;
-            while (2 * k <= n)
-            {
+            string binaryExp = Convert.ToString(n, 2);
+
+            decimal result_m = 1;
+            int result_exp = 0;
+            
+            for (int i = binaryExp.Length -1; i >= 0; i--)
+            {                
+                if (binaryExp[i] == '1')
+                    (_, result_m, result_exp) = Normalize(result_m * m, result_exp + exp);
+                
                 m *= m;
                 (_, m, exp) = Normalize(m, 2 * exp);
-                k *= 2;
-                s = true;
             }
 
-            // now calculated a^(2^i) with 2^i <= n
-            // what remains is the exponent n-2^i
-            for (int _ = k; _ < n; _++)
-            {
-                m *= a.Mantissa;
-                exp += a.Exponent;
-                if (!a.Sign) s = !s;
-                (bool s2, m, exp) = Normalize(m, exp);
-            }
+            bool s = n % 2 == 0 ? true : a.Sign;
 
-            return new(s, m, exp);
+            return new(s, result_m, result_exp);
         }
     }
 
@@ -170,8 +168,44 @@ public readonly struct BigDecimal : IEquatable<BigDecimal>, IComparable<BigDecim
 
     public static BigDecimal operator *(BigDecimal a, decimal d)
         => new (a.Sign, a.Mantissa * d, a.Exponent);
+    
+    public static BigDecimal operator *(decimal d, BigDecimal a) => a * d;
 
-    public static BigDecimal operator *(decimal d, BigDecimal a) => a * d; 
+    public static BigDecimal operator /(BigDecimal a, decimal d) => a * (1.0m / d);
+
+    public static BigDecimal operator -(BigDecimal a, BigDecimal b)
+    {
+        // Easy case: a and b have the same exponent, we can focus on the mantissa(+sign) only
+        if (a.Exponent == b.Exponent)
+        {
+            return new BigDecimal(a.SignedMantissa - b.SignedMantissa, a.Exponent);
+        }
+        else
+        {
+            int biggerExp = Math.Max(a.Exponent, b.Exponent);
+            int smallerExp = Math.Min(a.Exponent, b.Exponent);
+
+            // we only have 28 significant digits. if the exponents differ by more than 28, we simply ignore
+            // the smaller term
+            if (biggerExp - smallerExp >= 28)
+            {
+                if (a.Exponent > b.Exponent)
+                    return a;
+                else
+                    return new BigDecimal(!b.Sign, b.Mantissa, b.Exponent);
+            }
+            // if a and b are not too far appart, we need to conver the smaller term
+            // to the base of the bigger one
+            else
+            {
+                decimal deltaExp = (decimal)Math.Pow(10, biggerExp - smallerExp);
+                if (a.Exponent > b.Exponent)
+                    return new BigDecimal(a.SignedMantissa - b.SignedMantissa / deltaExp, biggerExp);
+                else
+                    return new BigDecimal(a.SignedMantissa / deltaExp - b.SignedMantissa, biggerExp);
+            }
+        }
+    }
 
     // Conversions to/from decimal
     public static explicit operator BigDecimal(decimal d) => new (d);

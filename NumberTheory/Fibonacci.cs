@@ -14,6 +14,9 @@ namespace NumberTheory
         private static readonly double SQRT5 = Math.Sqrt(5);
         private static readonly double PHI = (1 + SQRT5) / 2;
         private static readonly double PSI = (1 - SQRT5) / 2;
+        private static readonly decimal SQRT5d = (decimal)Math.Sqrt(5);
+        private static readonly BigDecimal PHId = new ((1m + SQRT5d) / 2);
+        private static readonly BigDecimal PSId = new ((1m - SQRT5d) / 2);
 
         // k for largest Fk that can be represented as ulong
         public const int MaxUlongIndex = 93;
@@ -114,14 +117,30 @@ namespace NumberTheory
             {
                 return 1;
             }
-            else if (k >= 1475)
-            {
-                throw new OverflowException($"F(k) can only be estimated for k < 1475");
-            }
-            else
+            else if (k < 1475)
             {
                 double x = (Math.Pow(PHI, k) - Math.Pow(PSI, k)) / SQRT5;
                 return Math.Round(x);
+            }
+            else
+                throw new OverflowException("Only Fibonacci numbers up to F1474 can be estimated. Use EstimateBig for larger k");
+        }
+
+        public static BigDecimal EstimateBig(int k)
+        {
+            if (k == 0)
+            {
+                return BigDecimal.Zero;
+            }
+            else if (k <= 2)
+            {
+                return BigDecimal.One;
+            }
+            else
+            {
+                BigDecimal t1 = (PHId ^ k) / SQRT5d;
+                BigDecimal t2 = (PSId ^ k) / SQRT5d;
+                return t1 - t2;
             }
         }
     }
