@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NumberTheory;
 
 namespace ProjectEuler;
 
@@ -14,12 +15,10 @@ class Program
         Console.OutputEncoding = Encoding.Unicode;
 
         var pm = new ProblemManager(
-            // all solved problems
-            Enumerable.Range(1, 106).Union([121, 126, 144, 146, 148, 169, 200, 243, 307])
-            // unsolved problems
-            //.Append(543) 
+            //Enumerable.Range(1, 106).Union([121, 126, 144, 146, 148, 169, 200, 243, 307, 543])
+            [543]
         );
-        
+
         // problems to solve for awards:
         // - fibonacci fever: solve 233
 
