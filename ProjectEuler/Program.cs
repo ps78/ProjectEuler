@@ -19,9 +19,6 @@ class Program
             [233]
         );
 
-        // problems to solve for awards:
-        // - fibonacci fever: solve 233
-
         pm.Run();
     }
 }
