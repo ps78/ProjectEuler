@@ -262,8 +262,28 @@ namespace UnitTests
             factors.Should().HaveCount(expected.Length);
             for (int i = 0; i < expected.Length; i++)
                 factors[i].Should().Be(expected[i]);
-        }        
-             
+        }
+
+        [Theory(DisplayName = "CountPrimes.Get()")]
+        [InlineData(1E1,  4)]
+        [InlineData(1E2,  25)]
+        [InlineData(1E3,  168)]
+        [InlineData(1E4,  1229)]
+        [InlineData(1E5,  9592)]
+        [InlineData(1E6,  78498)]
+        [InlineData(1E7,  664579)]
+        [InlineData(1E8,  5761455)]
+        [InlineData(1E9,  50847534)]
+        [InlineData(1E10, 455052511)]
+        [InlineData(1E11, 4118054813)]
+        //[InlineData(1E12, 37607912018)]   // runs ~1 s
+        //[InlineData(1E13, 346065536839)]  // runs ~5 s
+        //[InlineData(1E14, 3204941750802)] // runs ~25 s
+        public void TestCountPrimesGet(ulong n, ulong count)
+        {
+            CountPrimes.Get(n).Should().Be(count);
+        }
+
         #endregion
     }
 }

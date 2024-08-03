@@ -16,7 +16,7 @@ class Program
 
         var pm = new ProblemManager(
             //Enumerable.Range(1, 106).Union([121, 126, 144, 146, 148, 169, 200, 243, 307, 543])
-            [543]
+            [233]
         );
 
         // problems to solve for awards:

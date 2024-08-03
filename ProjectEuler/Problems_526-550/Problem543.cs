@@ -29,38 +29,17 @@ namespace ProjectEuler
     /// </summary>
     public class Problem543 : EulerProblemBase
     {
-        private SieveOfEratosthenes Sieve;
+        private IPrimeTest PrimeTest = new MillerRabinTest();
 
-        public Problem543() : base(543, "Prime-Sum Numbers", 44, 199007746081234640) 
-        {
-            Sieve = new SieveOfEratosthenes(1);
-        }
+        public Problem543() : base(543, "Prime-Sum Numbers", 44, 199007746081234640) { }
 
-        /// <summary>
-        /// Runtime for 
-        ///     n = 10: 0.008s
-        ///     n = 20: 0.015s
-        ///     n = 25: 0.695s
-        ///     n = 27: 4.47s
-        ///     n = 28: 11.4s
-        ///     n = 29: 29.6s
-        ///     n = 30: 78 s
-        ///     n = 31: 221 s
-        ///         
-        /// </summary>
-        /// <param name="n"></param>
-        /// <returns></returns>
         public override long Solve(long n)
         {
-            Sieve = new SieveOfEratosthenes(Fibonacci.Get((int)n));
-            
             ulong sum = 0;
             foreach (int k in Enumerable.Range(3, (int)n - 2))
-            {
                 sum += S(Fibonacci.Get(k));
-            }
+            
             return (long)sum;
-
         }
 
         /// <summary>
@@ -93,15 +72,13 @@ namespace ProjectEuler
         /// <returns></returns>
         private ulong S(ulong n)
         {
-            if (n <= 9)
-                return new ulong[] { 0, 0, 1, 2, 3, 5, 7, 10, 13, 16}[n];
+            if (n <= 6)
+                return new ulong[] { 0, 0, 1, 2, 3, 5, 7 }[n];
             else
             {
-                ulong primeCount = Sieve.CountPrimes(to: n);
-                
-                ulong primeCount3_to_n2 = primeCount - 1 
-                    - (ulong)(Sieve.IsPrime(n - 1) ? 1 : 0)
-                    - (ulong)(Sieve.IsPrime(n) ? 1 : 0);
+                ulong primeCount = CountPrimes.Get(n);
+                ulong delta = n % 2 == 0 ? 1UL : 0;
+                ulong primeCount3_to_n2 = primeCount - 1 - (PrimeTest.IsPrime(n - delta) ? 1UL : 0);
 
                 ulong sum = 0;
 
@@ -109,15 +86,16 @@ namespace ProjectEuler
                 sum += primeCount;
 
                 // k = 2
-                sum += ((n - 4) / 2 + 1);
+                sum += ((n - 4) / 2 + 1) - (n - 3) * 2;
                 sum += primeCount3_to_n2;
-
-                for (ulong i = 4; i <= n; i++)
-                    sum += (i / 2 - 3 + 1);
+                
+                if (n % 2 == 0)
+                    sum += (n - 4) / 2 * (n / 2 + 1) + n / 2;
+                else
+                    sum += (n / 2 - 1) * (2 + n / 2);
 
                 return sum;
             }
         }
-
     }
 }
