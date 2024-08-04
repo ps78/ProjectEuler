@@ -28,10 +28,10 @@ namespace ProjectEuler
     /// </summary>
     public class Problem233 : EulerProblemBase
     {
-        public Problem233() : base(233, "Lattice Points on a Circle", 4, 0) { }
+        public Problem233() : base(233, "Lattice Points on a Circle", 7, 0) { }
 
         /// <summary>
-        /// Circle radius r = Sqrt(N^2/2)
+        /// Circle radius r = Sqrt(N^2/2) = N/sqrt(2)
         /// 
         /// Equation of circle with center in (0,0): x^2 + y^2 = r^2
         /// Equation of circle with center at (N/2,N/2):  (x-N/2)^2 + (y-N/2)^2 = r^2 = N^2/2
@@ -40,54 +40,75 @@ namespace ProjectEuler
         ///              2x^2 - 2Nx + N^2/2 + 2y^2 - 2Ny + N^2/2 = N^2
         ///                              2x^2 + 2y^2 - 2Nx - 2Ny = 0
         ///                                          x^2 + y^2   = N(x+y)
-        ///                                          
+        /// 
         /// solving for y:
         /// 
         /// y^2 - Ny + x^2 - Nx = 0
         /// 
         /// y = (N +/- Sqrt[N^2 - 4(x^2-Nx)]) / 2
         /// 
+        /// sqlr(N^2 - 4x(x-N))
+        /// There is an 8-fold symmmetry, we only need to consider 
+        ///     0 < x < N/2, N/2-Sqrt(N^2/2) < y < 0
+        ///     
+        /// In addition, the 4 points given lie on the circle
+        /// Additionally, the 4 points at X=N/2 and y=N/2 may lie on the circle
+        /// 
+        /// In our problem, we are looing for circles with 420 lattice points, or 416 plus the 
+        /// given 4. 416 is divisible by 8 (416/8=52). Hence the circles we are looking for
+        /// must NOT have a lattice point at (x,y)=(N/2,N/2-Sqrt(N^2/2).
+        /// 
+        /// There must be exactly 52 solutions for y for x in the range [1..N/2) 
+        /// and x=N/2 must not be a solution.
+        /// condition is that N^2-4(x^2-Nx) = N^2+4x(N-x) is a square number
+        /// 
+        /// let Z = Sqrt[N^2+4x(N-x)]
+        /// then Z^2 - N^2 = 4x(N-x) = (Z+N)(Z-N)
+        /// 
+        /// Also = 
+        /// 
+        /// All N < 2E6 for which we have 420 lattice points are a multiple of 25
         /// </summary>
         public override long Solve(long n)
         {
+            const long L = 420;
+            const long start = 359125;
+            const long step = 100;
+
             long N = (long)Math.Pow(10, n);
-            var hist = new Dictionary<long, List<long>>();
+            long sum = 0;
 
-            for (long i = 1; i <= N; i++)
+            for (long i = start; i <= N; i += step)
             {
-                long latticePoints = CountLatticePoints(i);
-
-                if (latticePoints != 4) // 4 is the trivial case, ignore this
+                if (CheckLatticePoints(i, L))
                 {
-                    if (hist.TryGetValue(latticePoints, out List<long>? lst))
-                        lst.Add(i);
-                    else
-                        hist[latticePoints] = [i];
+                    sum += i;
+                    Console.WriteLine($"{i}");
                 }
             }
 
-            foreach (var entry in hist.OrderBy(kv => kv.Key))
-            {
-                var y = entry.Value;
-                var values = string.Join(",", entry.Value.Select(x => x.ToString()));
-                Console.WriteLine($">>{entry.Key}<<: {values}\n");
-            }
-
-            return 0;
+            return sum;
         }
 
-        private long CountLatticePoints(long N)
+        private bool CheckLatticePoints(long N, long Target)
         {
-            long count = 0;
-            long N2 = N * N;
-            for (long x = 0; x < N; x++)
+            long count = 4;
+            long Nsqr = N * N;
+            long Nhalf = N / 2;
+            for (long x = 1; x <= Nhalf; x++)
             {
-                long t = N2 - 4 * (x * x - N * x);
-                long root = (long)Math.Sqrt(t);
-                if (root * root == t)
-                    count++;
+                long t = Nsqr + 4 * x * (N - x);
+                if (double.IsInteger(Math.Sqrt(t)))
+                {
+                    if (x == Nhalf)
+                        count += 4;
+                    else 
+                        count += 8;
+                }
+                if (count > Target)
+                    return false;
             }
-            return 4 * count;
+            return count == Target;
         }
 
     }
