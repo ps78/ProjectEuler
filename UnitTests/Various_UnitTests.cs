@@ -57,7 +57,7 @@ namespace UnitTests
             }
 
             // Test the the correct subset is returned
-            PolygonalNumber.P(19, 1, 10).Should().BeEquivalentTo(nineteenSeries.Take(10));            
+            PolygonalNumber.P(19, 1, 10).Should().BeEquivalentTo(nineteenSeries.Take(10));
         }
         
         #endregion

@@ -71,13 +71,17 @@ namespace ProjectEuler
         /// 
         /// </summary>
         public override long Solve(long n)
-        {            
+        {
+            //Console.WriteLine(CountLatticePointsBruteForce(10*359125));
+            //Console.WriteLine(CountLatticePoints(10*359125));
+
             ulong N = (ulong)Math.Pow(10, n);
             var keyNumbers = new List<ulong>();
 
             // get all primes of the form p = 4k+1 up to the limit 10^11 / (5^3*13^2)
-            ulong keyPrimeLimit = (ulong)(N / (Math.Pow(5, 3) * Math.Pow(13, 2))) ;
+            ulong keyPrimeLimit = (ulong)(N / (Math.Pow(5, 3) * Math.Pow(13, 2))); // =upper bound for biggest possible prime factor
             ulong[] keyPrimes = Sieve.GetPrimes(from: 5, to: keyPrimeLimit).Where(p => (p - 1) % 4 == 0).ToArray();
+            
             // get all primes of the form p = 4k-1 up to the limit 10^11 / (5^3*13^2*17)
             ulong otherPrimeLimit = (ulong)(N / (Math.Pow(5, 3) * Math.Pow(13, 2) * 17)) ;
             ulong[] otherPrimes = Sieve.GetPrimes(from: 2, to: otherPrimeLimit).Where(p => (p==2) || ((p + 1) % 4 == 0)).ToArray();
@@ -94,7 +98,7 @@ namespace ProjectEuler
                     bool quit = false;
                     ulong power1 = keyPrimes[pos1].Power(expSet[0]);
                     for (int pos2 = pos1 + 1; pos2 < keyPrimes.Length; pos2++)
-                    {                        
+                    {
                         ulong power2 = keyPrimes[pos2].Power(expSet[1]);
                         if (power1 * power2 > N)
                         {
@@ -139,7 +143,7 @@ namespace ProjectEuler
             // now we have all numbers built only from prime factors of the form 4k+1
             // we need to add for each of these all possible factors of the form 4k-1 and 2
             // there can be a maximum of 6 additional factors:
-            //  359125 * 2 * 3 * 7 * 11 * 19 * 23 = 72'505'182'750
+            //    359125 * 2 * 3 * 7 * 11 * 19 * 23 = 72'505'182'750
 
             ulong sum = keyNumbers.Sum();
             var addNumbers = new List<ulong>();
@@ -149,12 +153,6 @@ namespace ProjectEuler
                 ExpandFactors(keyNumbers[i], otherPrimes, N, 0, ref addNumbers, ref factors);
             }
             sum += addNumbers.Sum();
-
-
-            foreach (var num in addNumbers.OrderBy(x => new Guid()).Take(10000).ToList())
-                if (CountLatticePoints(num) != L)
-                    throw new Exception();
-
 
             return (long)sum;
 
@@ -191,17 +189,57 @@ namespace ProjectEuler
                     break;
             }
         }
+        
+        private List<ulong[]> GetExponentSets(ulong l)
+        {
+            if (l % 4 != 0)
+                throw new ArgumentException("l must be divisible by 4");
+
+            var factors = Sieve.GetPrimeFactors(l / 4).Select(x => x.Item1).ToArray();
+
+            var sets = new List<ulong[]>();
+            for (int subSetSize = 1; subSetSize <= factors.Length; subSetSize++)
+            {
+                var subSet = Combination.Create(factors, subSetSize);
+                
+            }
+
+            return sets;
+        }
 
         private ulong CountLatticePoints(ulong N)
         {
             // we actually need to do this for M = (2N)^2/2
-            // this in fact doubles all exponents, hence we cannot have any odd exponents                                                         
+            // this in fact doubles all exponents, hence we cannot have any odd exponents
             var factors = Sieve.GetPrimeFactors(N);
             ulong product = 4;
             foreach(var factor in factors.Where(f => (f.Item1 - 1) % 4 == 0))
                 product *= (2*factor.Item2 + 1);
             
             return product;
+        }
+
+        /// <summary>
+        /// Solves the equation (x-N/2)^2 + (y-N/2)^2 = N^2/2
+        /// for y, for all x in 0..N-1
+        /// 
+        /// y^2 - Ny + x^2 - Nx + N^2/4 - N^2/2 + N^2/4 = 0 
+        /// y^2 - Ny - x(N-x) = 0
+        /// 
+        /// y = (N - Sqrt(N^2 + 4x(N-x))) / 2
+        /// </summary>
+        /// <param name="N"></param>
+        /// <returns></returns>
+        private ulong CountLatticePointsBruteForce(ulong N)
+        {
+            ulong count = 0;
+            for (ulong x = 0; x < N; x++)
+            {
+                ulong t = N * N + 4 * x * (N - x);
+                if (double.IsInteger(Math.Sqrt(t)))
+                    count++;
+            }
+            return 4*count;
         }
     }
 }

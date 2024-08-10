@@ -18,7 +18,6 @@ class Program
             //Enumerable.Range(1, 106).Union([121, 126, 144, 146, 148, 169, 200, 243, 307, 543])
             [233]
         );
-
         pm.Run();
     }
 }
