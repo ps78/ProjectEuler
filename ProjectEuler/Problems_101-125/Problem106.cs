@@ -70,7 +70,7 @@ namespace ProjectEuler
             return testCount;
         }
 
-        private bool AreDisjoint(int[] set1, int[] set2)
+        private bool AreDisjoint(IList<int> set1, IList<int> set2)
         {
             var s = new HashSet<int>(set1);
             foreach (int i in set2)
@@ -79,9 +79,9 @@ namespace ProjectEuler
             return true;
         }
 
-        private bool NeedTest(int[] set1, int[] set2)
+        private bool NeedTest(IList<int> set1, IList<int> set2)
         {
-            for (int i = 0; i < set1.Length; i++)
+            for (int i = 0; i < set1.Count; i++)
                 if (set1[i] > set2[i])
                     return true;
             return false;

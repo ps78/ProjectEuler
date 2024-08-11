@@ -9,7 +9,7 @@ namespace NumberTheory
     public class SimplePrimeTest : IPrimeTest
     {
         //static ulong[] smallPrimes = new ulong[] { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101 };
-        private static ulong[] smallPrimes = new ulong[] { 2, 3, 5, 7, 11, 13, 17, 19, 23 };
+        private static readonly ulong[] smallPrimes = [2, 3, 5, 7, 11, 13, 17, 19, 23];
 
         public bool IsPrime(ulong n)
         {

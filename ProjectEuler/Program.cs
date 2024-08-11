@@ -15,8 +15,7 @@ class Program
         Console.OutputEncoding = Encoding.Unicode;
 
         var pm = new ProblemManager(
-            //Enumerable.Range(1, 106).Union([121, 126, 144, 146, 148, 169, 200, 243, 307, 543])
-            [233]
+            Enumerable.Range(1, 106).Union([121, 126, 144, 146, 148, 169, 200, 233, 243, 307, 543])
         );
         pm.Run();
     }

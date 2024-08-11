@@ -84,10 +84,7 @@ namespace NumberTheory
         /// <param name="limit"></param>
         public SieveOfEratosthenes(ulong limit)
         {
-            if (limit < 30)
-                limit = 30;
-
-            this.Limit = limit;
+            Limit = Math.Max(30, limit);
 
             // create bitmasks
             bitMasks = new ulong[64];
@@ -133,7 +130,7 @@ namespace NumberTheory
             if (from < 2)
                 from = 2;
             if (to <= 0)
-                to = Limit;            
+                to = Limit;
 
             if (from > to)
                 throw new ArgumentException("from must be smaller than to");
@@ -204,7 +201,7 @@ namespace NumberTheory
         /// </summary>
         /// <param name="n"></param>
         /// <returns></returns>
-        public IEnumerable<Tuple<ulong, ulong>> GetPrimeFactors(ulong n, ulong[]? primes = null)
+        public IEnumerable<(ulong Factor, ulong Exponent)> GetPrimeFactors(ulong n, ulong[]? primes = null)
         {
             ulong root = (ulong)Math.Sqrt(n);
 
@@ -234,11 +231,11 @@ namespace NumberTheory
                         expCount++;
                     } while (remainder % p == 0);
                   
-                    yield return new Tuple<ulong, ulong>(p, expCount);
+                    yield return (p, expCount);
 
                     if (IsPrime(remainder))
                     {
-                        yield return new Tuple<ulong, ulong>(remainder, 1);
+                        yield return (remainder, 1);
                         break;
                     }
 
@@ -248,7 +245,7 @@ namespace NumberTheory
             }
 
             if (IsPrime(n))
-                yield return new Tuple<ulong, ulong>(n, 1);
+                yield return (n, 1);
         }
 
         /// <summary>
@@ -267,7 +264,7 @@ namespace NumberTheory
                 if (root >= 2)
                     primes = GetPrimes(2, root).ToArray();
                 else
-                    primes = new ulong[] { };
+                    primes = [];
             }
 
             GetFactorsRecursive(1, GetPrimeFactors(n, primes), ref factors);
@@ -358,7 +355,7 @@ namespace NumberTheory
             }            
         }
 
-        private void GetFactorsRecursive(ulong currentFactor, IEnumerable<Tuple<ulong, ulong>> primeFactors, ref List<ulong> factors)
+        private void GetFactorsRecursive(ulong currentFactor, IEnumerable<(ulong Factor, ulong Exponent)> primeFactors, ref List<ulong> factors)
         {
             if (!primeFactors.Any())
             {
@@ -369,10 +366,10 @@ namespace NumberTheory
             var curPrimeFactor = primeFactors.First();
             var nextPrimeFactors = primeFactors.Skip(1).ToArray();
             ulong f = 1;
-            for (ulong e = 0; e <= curPrimeFactor.Item2; e++)
+            for (ulong e = 0; e <= curPrimeFactor.Exponent; e++)
             {
                 GetFactorsRecursive(currentFactor * f, nextPrimeFactors, ref factors);
-                f *= curPrimeFactor.Item1;
+                f *= curPrimeFactor.Factor;
             }
         }
 

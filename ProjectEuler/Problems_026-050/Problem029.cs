@@ -32,14 +32,14 @@ namespace ProjectEuler
 
         private class Number
         {
-            public List<Tuple<ulong, ulong>> Factors = new List<Tuple<ulong, ulong>>();
+            public List<(ulong Factor, ulong Exponent)> Factors = new List<(ulong Factor, ulong Exponent)>();
             private ulong value = 0;
 
             public Number() { }
-            public Number(IEnumerable<Tuple<ulong, ulong>> f)
+            public Number(IEnumerable<(ulong Factor, ulong Exponent)> f)
             {
                 foreach (var fact in f)
-                    Factors.Add(new Tuple<ulong, ulong>(fact.Item1, fact.Item2));
+                    Factors.Add(new (fact.Factor, fact.Exponent));
             }
             public ulong GetValue()
             {
@@ -47,7 +47,7 @@ namespace ProjectEuler
                 {
                     value = 1;
                     foreach (var f in Factors)
-                        value *= f.Item1.Power(f.Item2);
+                        value *= f.Factor.Power(f.Exponent);
                     return value;
                 }
                 else
@@ -59,7 +59,7 @@ namespace ProjectEuler
                 var result = new Number();
                 ulong v = exponent.GetValue();
                 foreach (var f in Factors)
-                    result.Factors.Add(new Tuple<ulong, ulong>(f.Item1, f.Item2 * v));
+                    result.Factors.Add(new (f.Factor, f.Exponent * v));
                 return result;
             }
 
@@ -70,7 +70,7 @@ namespace ProjectEuler
                 {
                     if (sb.Length != 0)
                         sb.Append("*");
-                    sb.Append(f.Item1.ToString() + "^" + f.Item2.ToString());
+                    sb.Append(f.Factor.ToString() + "^" + f.Exponent.ToString());
                 }
                 return sb.ToString();
             }

@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Security;
 using NumberTheory;
 
 namespace ProjectEuler
@@ -15,7 +16,7 @@ namespace ProjectEuler
     /// </summary>
     public class Problem233 : EulerProblemBase
     {
-        public Problem233() : base(233, "Lattice Points on a Circle", 11, 0) { }
+        public Problem233() : base(233, "Lattice Points on a Circle", 11, 271204031455541309) { }
 
         private SieveOfEratosthenes Sieve = new SieveOfEratosthenes(5_000_000); // limit >= 10^11 / (5^3*13^2)
 
@@ -72,9 +73,6 @@ namespace ProjectEuler
         /// </summary>
         public override long Solve(long n)
         {
-            //Console.WriteLine(CountLatticePointsBruteForce(10*359125));
-            //Console.WriteLine(CountLatticePoints(10*359125));
-
             ulong N = (ulong)Math.Pow(10, n);
             var keyNumbers = new List<ulong>();
 
@@ -86,65 +84,17 @@ namespace ProjectEuler
             ulong otherPrimeLimit = (ulong)(N / (Math.Pow(5, 3) * Math.Pow(13, 2) * 17)) ;
             ulong[] otherPrimes = Sieve.GetPrimes(from: 2, to: otherPrimeLimit).Where(p => (p==2) || ((p + 1) % 4 == 0)).ToArray();
 
-            // these (ordered) sets of exponents are allowed for the prime factors of form 4k+1:
-            List<ulong[]> expSets2 = [[10, 2], [3, 7], [7, 3]];
-            List<ulong[]> expSets3 = [[1, 2, 3], [1, 3, 2], [2, 1, 3], [2, 3, 1], [3, 1, 2], [3, 2, 1]];
-
-            // for each exponent set we choose all possible prime factors 4k+1 such that the product is < 10^11
-            foreach (var expSet in expSets2)
+            List<ulong[]> expSets = GetExponentSets(L);
+            foreach (var expSet in expSets)
             {
-                for (int pos1 = 0; pos1 < keyPrimes.Length; pos1++)
-                {
-                    bool quit = false;
-                    ulong power1 = keyPrimes[pos1].Power(expSet[0]);
-                    for (int pos2 = pos1 + 1; pos2 < keyPrimes.Length; pos2++)
-                    {
-                        ulong power2 = keyPrimes[pos2].Power(expSet[1]);
-                        if (power1 * power2 > N)
-                        {
-                            if (pos2 == pos1 + 1)
-                                quit = true;
-                            break;
-                        }
-                        else
-                            keyNumbers.Add(power1 * power2);
-                    }
-                    if (quit) break;
-                }
+                int[] selectedPrimeIdx = Enumerable.Repeat(-1, expSet.Length).ToArray();
+                FindKeyNumbers(expSet, keyPrimes, N, ref selectedPrimeIdx, 0, ref keyNumbers);
             }
-
-            foreach (var expSet in expSets3)
-            {
-                for (int pos1 = 0; pos1 < keyPrimes.Length; pos1++)
-                {
-                    bool quit = false;
-                    ulong power1 = keyPrimes[pos1].Power(expSet[0]);
-                    for (int pos2 = pos1 + 1; pos2 < keyPrimes.Length; pos2++)
-                    {
-                        ulong power2 = keyPrimes[pos2].Power(expSet[1]);
-                        for (int pos3 = pos2 + 1; pos3 < keyPrimes.Length; pos3++)
-                        {
-                            ulong power3 = keyPrimes[pos3].Power(expSet[2]);
-                            if (power1 * power2 * power3 > N)
-                            {
-                                if (pos3 == pos2 + 1)
-                                    quit = true;
-                                break;
-                            }
-                            else
-                                keyNumbers.Add(power1 * power2 * power3);
-                        }
-                        if (quit) break;
-                    }
-                    if (quit) break;
-                }
-            }
-
+            
             // now we have all numbers built only from prime factors of the form 4k+1
             // we need to add for each of these all possible factors of the form 4k-1 and 2
             // there can be a maximum of 6 additional factors:
             //    359125 * 2 * 3 * 7 * 11 * 19 * 23 = 72'505'182'750
-
             ulong sum = keyNumbers.Sum();
             var addNumbers = new List<ulong>();
             for (int i = 0; i < keyNumbers.Count; i++)
@@ -155,10 +105,6 @@ namespace ProjectEuler
             sum += addNumbers.Sum();
 
             return (long)sum;
-
-            // wrong solutions:
-            // 259544953893862880
-            // 259567548676753505
         }
 
         private void ExpandFactors(ulong keyNumber, ulong[] potentialFactors, ulong N, int startIndexAt, ref List<ulong> numbers, ref Stack<ulong> factors)
@@ -189,22 +135,95 @@ namespace ProjectEuler
                     break;
             }
         }
-        
+
+        /// <summary>
+        /// finds all keyNumbers x < limit, which can be represented as the product of the given 
+        /// keyPrimes with exponents from the given expSet. 
+        /// Recursive method. KeyPrimes are taken in ascending order and expSet is not shuffled
+        /// </summary>
+        /// <param name="expSet"></param>
+        /// <param name="keyPrimes"></param>
+        /// <param name="limit"></param>
+        /// <param name="keyNumbers"></param>
+        private void FindKeyNumbers(ulong[] expSet, ulong[] keyPrimes, ulong limit, 
+                                    ref int[] selectedPrimeIdx, int currentPosition, 
+                                    ref List<ulong> keyNumbers,
+                                    ulong currentProduct = 1)
+        {
+            if (currentPosition >= expSet.Length)
+            {
+                if (currentProduct <= limit)
+                    keyNumbers.Add(currentProduct);
+            }
+            else
+            {
+                int start = currentPosition == 0 ? 0 : selectedPrimeIdx[currentPosition - 1] + 1;
+                for (int i = start; i < keyPrimes.Length; i++)
+                {
+                    double nextFactor = Math.Pow(keyPrimes[i], expSet[currentPosition]);
+                    if (nextFactor > limit || nextFactor*currentProduct > limit)
+                        return;
+
+                    selectedPrimeIdx[currentPosition] = i;
+                    ulong previousProduct = currentProduct;
+                    currentProduct *= keyPrimes[i].Power(expSet[currentPosition]);
+                    FindKeyNumbers(expSet, keyPrimes, limit, ref selectedPrimeIdx, currentPosition + 1, ref keyNumbers, currentProduct);
+                    currentProduct = previousProduct;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Generates all ordered sets [e0, e1, .. ek] of exponents such that 
+        /// 
+        /// with l = 4 * f0 * f1 *..fk where fi divide l
+        /// and fi = 2*ei+1
+        /// 
+        /// i.e. l = 420 => 
+        ///     420 = 4 * 3 * 5 * 7 => f = {5}  => e = {1,2,3}
+        ///     420 = 4 * 3 * 35    => f = {3,35}   => e = {1,17}
+        ///     420 = 4 * 5 * 21    => f = {5,21}   => e = {2,10}
+        ///     420 = 4 * 7 * 15    => f = {7,15}   => e = {3,7}
+        ///     420 = 4 * 105       => f = {105}    => e = {52}
+        /// 
+        /// returns all permutations of the corresponding sets e={..}
+        /// </summary>
+        /// <param name="l"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         private List<ulong[]> GetExponentSets(ulong l)
         {
             if (l % 4 != 0)
                 throw new ArgumentException("l must be divisible by 4");
 
-            var factors = Sieve.GetPrimeFactors(l / 4).Select(x => x.Item1).ToArray();
+            var factorSets = GetMultiplicativePartitions(l / 4);
 
-            var sets = new List<ulong[]>();
-            for (int subSetSize = 1; subSetSize <= factors.Length; subSetSize++)
+            // coreSets contains the factors f, the actual exponents f = 2e+1
+            var expSets = factorSets.Select(fset => fset.Select(f => (f - 1) / 2).ToArray()).ToArray();
+
+            var permutedSets = new List<ulong[]>();
+            foreach (var set in expSets)
+                foreach (var s in Permutation.Create<ulong, ulong[]>(set))
+                    permutedSets.Add(s);
+
+            return permutedSets;
+        }
+
+        /// <summary>
+        /// This function should return all products that form n
+        /// A general implementation would be nice but is fairly complicated
+        /// </summary>
+        private static List<ulong[]> GetMultiplicativePartitions(ulong n)
+        {
+            switch (n)
             {
-                var subSet = Combination.Create(factors, subSetSize);
-                
+                case 105: 
+                    return [[3, 5, 7], [3, 35], [5, 21], [7, 15], [105]];
+                case 9:
+                    return [[3, 3], [9]];
+                default: 
+                    throw new NotImplementedException("Partitioning of {n} not implemented");
             }
-
-            return sets;
         }
 
         private ulong CountLatticePoints(ulong N)
@@ -213,8 +232,8 @@ namespace ProjectEuler
             // this in fact doubles all exponents, hence we cannot have any odd exponents
             var factors = Sieve.GetPrimeFactors(N);
             ulong product = 4;
-            foreach(var factor in factors.Where(f => (f.Item1 - 1) % 4 == 0))
-                product *= (2*factor.Item2 + 1);
+            foreach(var factor in factors.Where(f => (f.Factor - 1) % 4 == 0))
+                product *= (2*factor.Exponent + 1);
             
             return product;
         }
@@ -230,7 +249,7 @@ namespace ProjectEuler
         /// </summary>
         /// <param name="N"></param>
         /// <returns></returns>
-        private ulong CountLatticePointsBruteForce(ulong N)
+        private static ulong CountLatticePointsBruteForce(ulong N)
         {
             ulong count = 0;
             for (ulong x = 0; x < N; x++)

@@ -37,9 +37,9 @@ public static class Combination
         }
     }
 
-    public static IEnumerable<T[]> Create<T>(T[] set, int k)
+    public static IEnumerable<IList<T>> Create<T>(IList<T> set, int k)
     {
-        int n = set.Length;
+        int n = set.Count;
         if (k > n)
             yield break;
 
@@ -58,7 +58,7 @@ public static class Combination
             for (int i = 0; i < k; i++)
                 workingSet[i] = set[setIdx[i]];
 
-            yield return (T[])workingSet.Clone();
+            yield return (IList<T>)workingSet.Clone();
 
             int idxToIncrease = -1;
             for (int j = k - 1; j >= 0; j--)
