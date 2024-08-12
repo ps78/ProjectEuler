@@ -1,10 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NumberTheory;
+﻿using System.Text;
 
 namespace ProjectEuler;
 
@@ -15,7 +9,8 @@ class Program
         Console.OutputEncoding = Encoding.Unicode;
 
         var pm = new ProblemManager(
-            Enumerable.Range(1, 106).Union([121, 126, 144, 146, 148, 169, 200, 233, 243, 307, 543])
+            //Enumerable.Range(1, 106).Union([121, 126, 144, 146, 148, 169, 200, 233, 243, 307, 543])
+            [107]
         );
         pm.Run();
     }

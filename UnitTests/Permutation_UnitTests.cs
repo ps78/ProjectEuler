@@ -28,12 +28,7 @@ public class Permutation_UnitTests
         int[] set = [1, 2, 3];
 
         List<int[]> target = [[1, 2, 3], [1, 3, 2], [2, 1, 3], [2, 3, 1], [3, 1, 2], [3, 2, 1]];
-        List<int[]> actual = new List<int[]>();
-        
-        foreach (var s in Permutation.Create<int, int[]>(set))
-        {
-            actual.Add(s);
-        }
+        List<int[]> actual = Permutation.Create<int, int[]>(set).ToList();
         
         target.ToHashSet().Should().BeEquivalentTo(actual.ToHashSet());
     }
