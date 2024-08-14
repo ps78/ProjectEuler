@@ -36,6 +36,11 @@ namespace NumberTheory
         /// </summary>
         private readonly double DefaultPriority;
 
+        /// <summary>
+        /// Used to speed up the Contains() method
+        /// </summary>
+        private readonly HashSet<T> Set = new HashSet<T>();
+
         #endregion
         #region Properties
 
@@ -84,7 +89,9 @@ namespace NumberTheory
         public void Queue(double Priority, T Item)
         {
             if (Length == 0)
+            {
                 items.Add((Priority, Item));
+            }
             else
             {
                 if (Order == PriorityQueueOrder.Ascending)
@@ -100,6 +107,7 @@ namespace NumberTheory
                     items.Insert(idx, (Priority, Item));
                 }
             }
+            Set.Add(Item);
         }
 
         /// <summary>
@@ -123,6 +131,8 @@ namespace NumberTheory
 
             var item = items[Length - 1];
             items.RemoveAt(Length - 1);
+            Set.Remove(item.Item);
+
             return item;
         }
 
@@ -141,15 +151,24 @@ namespace NumberTheory
                 while (idx < items.Count && items[idx].Priority <= PriorityLimit) idx++;
 
             if (idx < items.Count)
+            {
+                for (int i = idx; i < items.Count; i++)
+                {
+                    Set.Remove(items[idx].Item);
+                }
                 items.RemoveRange(idx, items.Count - idx);
+            }
         }
 
         public bool Contains(T Item)
         {
+            return Set.Contains(Item);
+            /*
             foreach (var it in items)
                 if (it.Item != null && it.Item.Equals(Item))
                     return true;
             return false;
+            */
         }
 
         #endregion

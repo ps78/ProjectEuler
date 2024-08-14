@@ -1,4 +1,5 @@
 ﻿using NumberTheory;
+using System.ComponentModel;
 using System.Xml.Linq;
 
 namespace ProjectEuler;
@@ -21,32 +22,59 @@ namespace ProjectEuler;
 /// </summary>
 public class Problem107 : EulerProblemBase
 {
-    // represents a symmetrical matrix with integer values, diagonal being zero
-    private class GraphMatrix: ICloneable, IEquatable<GraphMatrix>
+    /// <summary>
+    /// Represents a symmetrical matrix with integer values, diagonal being zero
+    /// There are 3 index types being used:
+    /// 1) node index: from 0..N-1, an index per vertex
+    /// 2) linear index: from 0..(N^2-N)/2-1, an index for each potential edge, lower part of symmetric matrix
+    /// 3) (row,col): index-into the edge matrix, where row/col correspond to node indexes
+    ///  
+    /// </summary>
+    private class GraphMatrix: IEquatable<GraphMatrix>
     {
         public readonly int N;
+        public readonly int MaxEdgeCount; // (N*N-N)/2
 
         // we only store the lower half of the matrix w/o diagonal, in linear form
-        private readonly int[] Data; 
+        private readonly int[] Data;
+
+        // for each edge (same index as in data), this stores wheter it is a 
+        // bridge edge (true) or not (false) or unknown (null)
+        // A bridge edge is an edge that whose removal will split the graph
+        private readonly bool?[] BridgeEdges;
+
+        private bool? isConnected = null;
+        private int? cost = null;
+        private int? edgeCount = null;
+        private int? hashCode = null;
+        private bool? isMinimallyConnected = null;
         
-        public int this[int row, int col] {
+        public int this[int row, int col]
+        {
             get 
             {
-                if (row == col) return 0;
-                if (row < col) (row, col) = (col, row);
-                return Data[(row - 1) * row / 2 + col];
-            }
-            set
-            {
-                if (row == col) return;
-                if (row < col) (row, col) = (col, row);
-                Data[(row - 1) * row / 2 + col] = value;
+                int idx = ToLinearIndex(row, col);
+                return (idx == -1) ? 0 : Data[idx];
             }
         }
 
-        public int Cost => Data.Sum();
+        public int Cost
+        {
+            get
+            {
+                cost ??= Data.Sum();
+                return cost.Value;
+            }
+        }
 
-        public int EdgeCount => Data.Count(x => x != 0);
+        public int EdgeCount
+        {
+            get
+            {
+                edgeCount ??= Data.Count(x => x != 0);
+                return edgeCount.Value;
+            }
+        }
 
         public IEnumerable<(int From, int To, int Value)> Edges
         {
@@ -62,6 +90,9 @@ public class Problem107 : EulerProblemBase
             }
         }
 
+        /// <summary>
+        /// Returns all nodes that are connected to node
+        /// </summary>
         public IEnumerable<int> ConnectedNodes(int node)
         {
             for (int col = 0; col < N; col++)
@@ -73,12 +104,36 @@ public class Problem107 : EulerProblemBase
         {
             get
             {
-                var foundNodes = new HashSet<int>();
-                var currentNodes = new List<int>([0]);
-                RecursiveExpand(foundNodes, currentNodes);
-                return foundNodes.Count == N;
+                if (isConnected == null)
+                {
+                    var foundNodes = new HashSet<int>();
+                    var currentNodes = new List<int>([0]);
+                    RecursiveExpand(foundNodes, currentNodes);
+                    isConnected = foundNodes.Count == N;
+                }
+                return isConnected.Value;
             }
         }
+
+        public bool IsBridgeEdge(int linearIndex)
+        {
+            if (!BridgeEdges[linearIndex].HasValue)
+            {
+                if (Data[linearIndex] == 0)
+                {
+                    BridgeEdges[linearIndex] = false;
+                }
+                else
+                {
+                    var clone = new GraphMatrix(this, linearIndex);
+                    BridgeEdges[linearIndex] = !clone.IsConnected;
+                }
+            }
+
+            return BridgeEdges[linearIndex].Value;
+        }
+
+        public bool IsBridgeEdge(int row, int col) => IsBridgeEdge(ToLinearIndex(row, col));
 
         /// <summary>
         /// True, if removing any of the edges will cause the network to break apart
@@ -87,84 +142,114 @@ public class Problem107 : EulerProblemBase
         {
             get
             {
-                for (int i = 0; i < Data.Length; i++)
-                    if (Data[i] != 0)
-                    {
-                        var clone = (GraphMatrix)Clone();
-                        clone.Data[i] = 0;
-                        if (clone.IsConnected)
-                            return false;
-                    }
-                return true;
+                if (isMinimallyConnected == null)
+                {
+                    isMinimallyConnected = true;
+                    for (int i = 0; i < Data.Length; i++)
+                        if (Data[i] != 0 && !IsBridgeEdge(i))
+                        {
+                            isMinimallyConnected = false;
+                            break;
+                        }
+                }
+                return isMinimallyConnected.Value;
             }
         }
 
         public GraphMatrix(int n)
         {
             N = n;
-            Data = new int[(N*N - N) / 2];
+            MaxEdgeCount = (N * N - N) / 2;
+            Data = new int[MaxEdgeCount];
+            BridgeEdges = new bool?[Data.Length];
         }
 
-        public object Clone()
+        public GraphMatrix(GraphMatrix other) : this(other.N)
         {
-            GraphMatrix clone = new(N);
-            Array.Copy(Data, clone.Data, Data.Length);
-            return clone;
+            Array.Copy(other.Data, Data, other.Data.Length);
+            Array.Copy(other.BridgeEdges, BridgeEdges, other.BridgeEdges.Length);
+
+            isConnected = other.isConnected;
+            cost = other.cost;
+            edgeCount = other.edgeCount;
+            hashCode = other.hashCode;
+            isMinimallyConnected = other.isMinimallyConnected;
         }
 
-        public static GraphMatrix FromFile(string file)
+        public GraphMatrix(GraphMatrix other, int dropEdgeLinearIndex) : this(other.N)
         {
-            int n = -1;
-            GraphMatrix? m = null;
+            Array.Copy(other.Data, Data, other.Data.Length);
+            Data[dropEdgeLinearIndex] = 0;
+        }
+
+        public GraphMatrix(GraphMatrix other, (int row,int col) dropEdge) : this(other.N)
+        {
+            Array.Copy(other.Data, Data, other.Data.Length);
+            Data[ToLinearIndex(dropEdge.row, dropEdge.col)] = 0;
+        }
+
+        public GraphMatrix(string file)
+        {
+            int[]? data = null;
             int row = 0;
             foreach (var line in File.ReadAllLines(file))
             {
                 var values = line.Split(',').Select(s => s == "-" ? 0 : int.Parse(s)).ToArray();
-                if (m == null)
+                if (data == null)
                 {
-                    n = values.Length;
-                    m = new GraphMatrix(n);
+                    N = values.Length;
+                    MaxEdgeCount = (N * N - N) / 2;
+                    data = new int[MaxEdgeCount];
                 }
-                else if (values.Length != n)
+                else if (values.Length != N)
                     throw new InvalidDataException($"The following line contains the wrong number of elements: {line}");
 
-                if (row >= n)
+                if (row >= N)
                     throw new InvalidDataException($"The matrix contains too many rows");
 
                 for (int col = 0; col < row; col++)
-                    m[row, col] = values[col];
+                    data[ToLinearIndex(row,col)] = values[col];
                 row++;
             }
-            if (m != null)
-                return m;
+            if (data != null)
+            {
+                Data = data;
+                BridgeEdges = new bool?[Data.Length];
+            }
             else
                 throw new InvalidDataException("Could not read data");
         }
 
-        private void RecursiveExpand(HashSet<int> foundNodes, List<int> currentNodes)
+        public int ToLinearIndex(int row, int col)
         {
-            var currentCopy = new List<int>(currentNodes);
-            foreach (int node in currentCopy)
+            if (row == col) return -1;
+            if (row < col)
+                (row, col) = (col, row);
+            return (row - 1) * row / 2 + col;
+        }
+
+        public (int row, int col) ToNodeIndex(int linearIndex)
+        {
+            for (int j = N-1; j >= 0; j--)
             {
-                foundNodes.Add(node);
-                currentNodes.Remove(node);
-
-                var newNodes = ConnectedNodes(node).Where(c => !foundNodes.Contains(c)).ToArray();
-
-                if (newNodes.Any())
+                if (2*linearIndex >= j * j - j)
                 {
-                    currentNodes.AddRange(newNodes);
-                    RecursiveExpand(foundNodes, currentNodes);
+                    return (j, (2 * linearIndex - j * j + j) / 2);
                 }
             }
+            throw new ArgumentException($"Linear index {linearIndex} is invalid");
         }
 
         public override int GetHashCode()
         {
-            int code = Data[0];
-            for (int i = 1; i < Data.Length; i++)
-                code ^= Data[i];
-            return code;
+            if (hashCode == null)
+            {
+                int code = Data[0];
+                for (int i = 1; i < Data.Length; i++)
+                    code ^= Data[i];
+                hashCode = code;
+            }
+            return hashCode.Value;
         }
 
         public override bool Equals(object? obj)
@@ -180,7 +265,7 @@ public class Problem107 : EulerProblemBase
             if (other == null) 
                 return false;
             
-            if (N != other.N)
+            if (N != other.N || GetHashCode() != other.GetHashCode())
                 return false;
             
             for (int i = 0; i < Data.Length; i++)
@@ -189,13 +274,44 @@ public class Problem107 : EulerProblemBase
             
             return true;
         }
+
+        public override string ToString()
+        {
+            return $"Network with {N} nodes, {EdgeCount} edges, cost {Cost}";
+        }
+
+        /// <summary>
+        /// Used by IsConnected to check if the network is connected or fragmented
+        /// </summary>
+        /// <param name="foundNodes"></param>
+        /// <param name="currentNodes"></param>
+        private void RecursiveExpand(HashSet<int> foundNodes, List<int> currentNodes)
+        {
+            var currentCopy = new List<int>(currentNodes);
+            foreach (int node in currentCopy)
+            {
+                if (foundNodes.Count == N)
+                    return;
+
+                foundNodes.Add(node);
+                currentNodes.Remove(node);
+
+                var newNodes = ConnectedNodes(node).Where(c => !foundNodes.Contains(c)).ToArray();
+
+                if (newNodes.Any())
+                {
+                    currentNodes.AddRange(newNodes);
+                    RecursiveExpand(foundNodes, currentNodes);
+                }
+            }
+        }
     }
 
     public Problem107() : base(107, "Minimal Network", 0, 0) { }
 
     public override long Solve(long n)
     {
-        var m = GraphMatrix.FromFile(Path.Combine(ResourcePath, "problem107.txt"));
+        var m = new GraphMatrix(Path.Combine(ResourcePath, "problem107_small.txt"));
 
         Console.WriteLine($"Loaded network with {m.N} vertices, {m.EdgeCount} edges and total cost of {m.Cost}");
 
@@ -204,28 +320,45 @@ public class Problem107 : EulerProblemBase
         
         Console.WriteLine($"Minimal cost: {bestSolution.Last().Cost}, Iteration count: {astar.IterationCount}");
 
+        Console.WriteLine("Next solutions:");
+        foreach (var sol in astar.Search([m]).Take(15))
+        {
+            Console.WriteLine($"Minimal cost: {sol.Last().Cost}");
+        }
+
         return 0;
     }
 
     /// <summary>
-    /// Given a current network, the best possible soulution (lower boudn for cost) that could be 
-    /// found is the network, where we keep for each node the lowest value edge
+    /// Given a current network, the best possible solution (lower bound for cost) that could be 
+    /// found is the network, where we keep only the bridge edges
+    /// The cost to get there is -Sum(bridge edges)
     /// </summary>
     private double Heuristic(GraphMatrix node)
     {
-        double minPossibleCost = 0;
+        // get all bridge edges. These must be kept for the goal state
+        var edges = node.Edges
+            .Where(e => node.IsBridgeEdge(e.From, e.To))
+            .Select(x => (node.ToLinearIndex(x.From, x.To), x))
+            .ToDictionary();
+
+        // for all nodes, add the smallest edge from that node, 
+        // unless it is already connected
         for (int i = 0; i < node.N; i++)
         {
-            int min = int.MaxValue;
-            for (int j = 0; j < node.N; j++)
+            // if that node is already in the edges list, skip
+            if (!edges.Any(x => x.Value.From == i || x.Value.To == i))
             {
-                int edgeVal = node[i, j];
-                if (edgeVal != 0 && edgeVal < min)
-                    min = edgeVal;
+                var minEdge = node.ConnectedNodes(i)
+                    .Select(x => (From: i, To: x, Cost: node[i, x]))
+                    .OrderBy(x => x.Cost)
+                    .First();
+
+                edges.Add(node.ToLinearIndex(minEdge.From, minEdge.To), minEdge);
             }
-            minPossibleCost += min;
         }
-        return minPossibleCost;// - node.Cost;
+        
+        return edges.Sum(x => x.Value.Value) - (node.Cost);
     }
 
     /// <summary>
@@ -234,20 +367,22 @@ public class Problem107 : EulerProblemBase
     /// </summary>
     private bool IsGoal(GraphMatrix node) => node.IsMinimallyConnected;
 
-    private double Cost(GraphMatrix node) => node.Cost;
+    /// <summary>
+    /// nodes have no cost, we are only interested in minimizing the cost of the path, 
+    /// i.e. removal of edges
+    /// </summary>
+    private double Cost(GraphMatrix node) => 0;
 
     private List<(double CostToGetThere, GraphMatrix Neighbor)> GetNeighbors(GraphMatrix node)
     {
         var neighbors = new List<(double CostToGetThere, GraphMatrix Neighbor)>();
-        var edges = node.Edges.ToList();
-        foreach (var edge in edges.OrderByDescending(x => x.Value))
-        {
-            var neighbor = (GraphMatrix)node.Clone();
 
-            neighbor[edge.From, edge.To] = 0;
-            if (neighbor.IsConnected)
-                neighbors.Add((-edge.Value, neighbor));
+        foreach (var (From, To, Value) in node.Edges.Where(e => !node.IsBridgeEdge(e.From, e.To)))
+        {
+            neighbors.Add((-Value, new GraphMatrix(node, (From, To))));
         }
+
+        //return neighbors.OrderByDescending(n => n.CostToGetThere).ToList();
         return neighbors;
     }
 }

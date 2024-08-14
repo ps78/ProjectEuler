@@ -2,7 +2,7 @@
 
 /// <summary>
 /// Signature of a heuristic function that returns a lower boundary to the cost of getting from the given node to the target condition
-/// </summary>    
+/// </summary>
 public delegate double AStarHeuristicFunction<TNode>(TNode node) where TNode: notnull;
 
 /// <summary>
@@ -11,7 +11,7 @@ public delegate double AStarHeuristicFunction<TNode>(TNode node) where TNode: no
 public delegate bool AStarIsGoalFunction<TNode>(TNode node) where TNode : notnull;
 
 /// <summary>
-/// Function that returns the cost of a given path
+/// Function that returns the cost of a given node
 /// </summary>
 public delegate double AStarCostFunction<TNode>(TNode node) where TNode : notnull;
 
@@ -28,7 +28,7 @@ public class AStarPath<TNode> where TNode : notnull, IEquatable<TNode>
 {
     #region Fields
 
-    private readonly List<TNode> nodes = new List<TNode>();
+    private readonly List<TNode> nodes = [];
     private readonly AStarCostFunction<TNode> costFunction = (n) => 0;
 
     #endregion
@@ -66,13 +66,14 @@ public class AStarPath<TNode> where TNode : notnull, IEquatable<TNode>
     {
         if (costFunc == null)
             throw new NullReferenceException("The cost function must not be null");
+        this.costFunction = costFunc;
     }
     
     #endregion
     #region Public Methods
 
     /// <summary>
-    /// Appends a node to the end of th path
+    /// Appends a node to the end of the path
     /// </summary>
     public void Append(TNode node)
     {
@@ -145,7 +146,7 @@ public class AStarSearch<TNode> where TNode : notnull, IEquatable<TNode>
         var closedSet = new List<TNode>();
 
         // set of nodes not yet evaluated
-        var openSet = new PriorityQueue<TNode>(PriorityQueue<TNode>.PriorityQueueOrder.Ascending);            
+        var openSet = new PriorityQueue<TNode>(PriorityQueue<TNode>.PriorityQueueOrder.Ascending);
 
         // For each node, which node it can most efficiently be reached from.
         // If a node can be reached from many nodes, cameFrom will eventually contain the
