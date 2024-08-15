@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 using Xunit;
 using FluentAssertions;
 using NumberTheory;
+using Xunit.Abstractions;
 
 namespace UnitTests;
 
-public class BigDecimal_UnitTests
+public class BigDecimal_UnitTests(ITestOutputHelper output) : UnitTestBase(output)
 {
     [Theory(DisplayName = "BigDecimal: Constructor(d)")]
     [InlineData(1.0, true, 1.0, 0)]

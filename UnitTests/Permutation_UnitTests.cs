@@ -10,18 +10,8 @@ using Xunit.Abstractions;
 
 namespace UnitTests;
 
-public class Permutation_UnitTests
+public class Permutation_UnitTests(ITestOutputHelper output) : UnitTestBase(output)
 {
-    #region Setup / Helper
-
-    private readonly ITestOutputHelper testOutput;
-
-    public Permutation_UnitTests(ITestOutputHelper testOutputHelper)
-    {
-        testOutput = testOutputHelper;
-    }
-    #endregion
-
     [Fact(DisplayName = "Permutation: Create")]
     public void TestCreate()
     {

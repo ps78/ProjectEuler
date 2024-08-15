@@ -12,18 +12,8 @@ using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 
 namespace UnitTests;
 
-public class EulerProblems_UnitTests
+public class EulerProblems_UnitTests(ITestOutputHelper output) : UnitTestBase(output)
 {
-    #region Setup / Helper
-
-    private readonly ITestOutputHelper testOutput;
-
-    public EulerProblems_UnitTests(ITestOutputHelper testOutputHelper)
-    {
-        testOutput = testOutputHelper;
-    }
-    #endregion
-
     [Fact(DisplayName = "Run Test() methods of all problems")]
     public void TestProblemsFast()
     {

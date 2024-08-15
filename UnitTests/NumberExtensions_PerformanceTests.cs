@@ -12,19 +12,8 @@ using Xunit.Abstractions;
 
 namespace UnitTests;
 
-public class NumberExtensions_PerformanceTests
+public class NumberExtensions_PerformanceTests(ITestOutputHelper output) : UnitTestBase(output)
 {
-    #region Setup / Helper
-
-    private readonly ITestOutputHelper testOutput;
-
-    public NumberExtensions_PerformanceTests(ITestOutputHelper testOutputHelper)
-    {
-        testOutput = testOutputHelper;
-    }
-    #endregion
-    #region Test Methods
-    
     [Fact(DisplayName = "Performance: Power() / BigPower")]
     public void TestPowerPerformance()
     {
@@ -120,6 +109,4 @@ public class NumberExtensions_PerformanceTests
         time = sw.Elapsed.TotalSeconds;
         testOutput.WriteLine($"Running Math.Sqrt(): {nTest / time:n0} / sec");
     }
-
-    #endregion
 }
