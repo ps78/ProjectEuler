@@ -9,9 +9,12 @@ class Program
         Console.OutputEncoding = Encoding.Unicode;
 
         var pm = new ProblemManager(
-            //Enumerable.Range(1, 106).Union([121, 126, 144, 146, 148, 169, 200, 233, 243, 307, 543])
-            [107]
+            Enumerable.Range(1, 110).Union([121, 126, 144, 146, 148, 169, 200, 233, 243, 307, 543])
+            //[109]
         );
+
+        // 50 easies problems: need 206, 684, 686, 700, 719, 751, 800, 808, 816, 836, 853, 872, 
+
         pm.Run();
     }
 }

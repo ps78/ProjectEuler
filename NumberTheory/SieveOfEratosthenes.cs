@@ -273,6 +273,15 @@ namespace NumberTheory
         }
 
         /// <summary>
+        /// Returns the number of factors of n
+        /// </summary>
+        /// <param name="primes">if not null, must contain all primes up to sqrt(n)</param>
+        public int CountFactors(ulong n, ulong[]? primes = null)
+        {
+            return (int)GetPrimeFactors(n, primes).Select(f => f.Exponent+1).Product();
+        }
+
+        /// <summary>
         /// Returns the number of primes in the given range
         /// </summary>
         /// <param name="from">Lower bound, inclusive. 0 if omitted</param>
