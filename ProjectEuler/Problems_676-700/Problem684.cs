@@ -1,4 +1,7 @@
 ﻿using NumberTheory;
+using System.Diagnostics;
+using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 
@@ -9,34 +12,30 @@ namespace ProjectEuler;
 /// </summary>
 public class Problem684 : EulerProblemBase
 {
-    private static readonly Dictionary<ulong, ulong> PowerOfTen;
-    private static Dictionary<ulong, ulong> PowerOfTenSums;
-    private static readonly ulong MOD = 1_000_000_007;
-    static Problem684()
-    {
-        PowerOfTen = Enumerable.Range(0, 19).Select(i => ((ulong)i, (ulong)Math.Pow(10, i) % MOD)).ToDictionary();
-        PowerOfTenSums = Enumerable.Range(1, 18).Select(i => ((ulong)i, ulong.Parse(new String('1', i)) % MOD)).ToDictionary();
-        PowerOfTenSums[0] = 0;
-    }
-
+    private static readonly long MOD = 7919; //1_000_000_007;
+    
     public Problem684() : base(684, "Inverse Digit Sum", 0, 0) { }
 
     public override long Solve(long n)
     {
-        ulong P = 12;
-        Console.WriteLine($"{PowerOfTenSums[P]}");
-        Console.WriteLine($"{PowerOfTenSumMod(P)}");
-
-        ulong sum = 0;
-        for (ulong k = 0; k < P; k++)
+        var nums = new Dictionary<long, int>();
+        for (int p = 1; p <= MOD/2; p++)
         {
-            sum = sum + (ulong)Math.Pow(10, k);
+            BigInteger x = BigInteger.Parse(new String('1', p));
+            var m = (long)(x % MOD);
+            if (nums.ContainsKey(m))
+                nums[m]++;
+            else
+                nums[m] = 1;
         }
-        Console.WriteLine($"{sum % MOD}");
+        nums
+            .OrderBy(x => x.Key)
+            .Select(x => $"{x.Key}: {x.Value}")
+            .ToList()
+            .ForEach(x => Console.WriteLine(x));
 
-
-        for (ulong i = 1; i <= 45; i++)
-            Console.WriteLine($"{i} : {S(i)}");
+        //for (long i = 1; i <= 59; i++)
+        //    Console.WriteLine($"{i} : {S(i,1009)}");
 
         /*
         ulong sum = 0;
@@ -53,30 +52,70 @@ public class Problem684 : EulerProblemBase
         return 0;
     }
 
-    private ulong S(ulong n)
-    {
-        // S(45) = 599949
-        ulong P = n / 9;
-        ulong idx = Math.Min(P, 14);
-        ulong baseSum = 54 * PowerOfTenSums[idx] - 9 * P;
+    /// <summary>
+    /// calculates S(n) MOD M
+    /// </summary>
+    private long S(long n, long M)
+    {        
+        long P = ((n - 1) / 9);
+        long r = (n - 9 * P);
+        long D = PowerTenSum(P, M);
+        long PowTen = PowerTen(P, M);
 
-        ulong remSum = 0;
-        for (ulong i = 1; i <= n - 9 * P; i++)
-            remSum += ((PowerOfTen[idx] - 1) + i * PowerOfTen[idx]);
+        P = P % M;
+        r = r % M;
+        
+        long A = (54 * D - 9 * P) % M;
 
-        return (baseSum + remSum) % MOD;
+        long C = (r * (r + 1) / 2) % M;
+        C = (C * PowTen) % M;
+        C = C + (r * (PowTen - 1) % M);
+
+        return (A + C) % M;
     }
 
     /// <summary>
-    /// Calculates Sum[k=0..P](10^k) % MOD
+    /// Computes 10^p mod M for large p
     /// </summary>
-    /// <param name="P"></param>
-    /// <returns></returns>
-    private ulong PowerOfTenSumMod(ulong P)
+    public static long PowerTen(long exp, long modulus)
     {
-        if (P <= 10)
-            return PowerOfTenSums[P];
-        else
-            return (PowerOfTenSumMod(P / 2) * PowerOfTenSumMod(P - P / 2)) % MOD;
+        if (modulus == 1)
+            return 0;
+        else if (exp == 0)
+            return 1;
+        else if (exp == 1)
+            return 10 % modulus;
+
+        long result = 1;
+        long bas = 10 % modulus;
+        long ex = exp;
+        while (ex > 0)
+        {
+            if (ex % 2 == 1)
+                result = (result * bas) % modulus;
+            ex = ex >> 1;
+            if (ex > 0)
+                bas = (bas * bas) % modulus;
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Computes Sum(10^i) % M for i = 0..p-1
+    /// Sum(10^i), i=0..p-1
+    /// corresonds to the number consisting of p 1's
+    /// 
+    /// the largest P for the given problem is 320007466041201791 (3.2*10^17)
+    /// </summary>
+    private long PowerTenSum(long P, long M)
+    {
+        //return Enumerable.Range(0, (int)P).Select(p => PowerTen(p,M)).Sum() % M;
+        return P == 0 ? 0 : long.Parse(new String('1', (int)P)) % M;
+
+        // TODO: now to solve this for very large P??
+        // We know PowerTenSums(P,M) is cyclic with cycle M (or even M/2)
+        // Hence computing the sum for one cycle and then multipyling it 
+        // cuts down the computation effort, but it's still too large as M~10^9
     }
 }
