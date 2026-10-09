@@ -118,6 +118,19 @@ public class Prime_UnitTests(ITestOutputHelper output) : UnitTestBase(output)
         Assert.ThrowsAny<Exception>(() => s.GetPrimes(50, 200));
     }
 
+    [Fact(DisplayName = "SieveOfEratosthenes: composite limit is not reported as prime")]
+    public void TestSieveOfEratosthenesCompositeLimit()
+    {
+        // regression: a composite limit that is not divisible by 2, 3 or 5 used to be reported as prime
+        foreach (ulong limit in new ulong[] { 49, 121, 161, 511, 1_000_001 })
+        {
+            var s = new SieveOfEratosthenes(limit);
+            s.IsPrime(limit).Should().BeFalse();
+            s.GetPrimes().Should().NotContain(limit);
+        }
+        new SieveOfEratosthenes(1_000_003).IsPrime(1_000_003).Should().BeTrue();
+    }
+
     [Fact(DisplayName = "SieveOfEratosthenes performance tests")]
     public void TestSieveOfErastosthenesPerformance()
     {

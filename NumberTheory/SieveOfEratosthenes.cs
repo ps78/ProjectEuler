@@ -348,7 +348,7 @@ namespace NumberTheory
                 // remove all multiples of the current prime from the sieve. 
                 // start at currentPrime^2, all smaller multiples have already been removed
                 ulong multiple = currentPrime * currentPrime;
-                while (multiple < Limit)
+                while (multiple <= Limit)
                 {
                     // only use the multiple if it is not already declassified as prime
                     if (this[multiple] == true)

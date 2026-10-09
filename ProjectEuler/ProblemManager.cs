@@ -87,7 +87,7 @@ namespace ProjectEuler
 
             foreach (var p in problems.OrderBy(p => p.ProblemNumber))
             {
-                string lineStart = $"{p.ProblemNumber,3:D3}: {p.Title,-50}";
+                string lineStart = $"{p.ProblemNumber,4:D4}: {p.Title,-50}";
                 
                 // run test first, skip if this already fails
                 if (!p.Test())
