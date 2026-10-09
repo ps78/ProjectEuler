@@ -36,7 +36,7 @@ namespace ProjectEuler
         // TODO: the test doesn't work as it should, there must be an error in the algorithm. 
         // public override bool Test() => Solve(39) == 41 && Solve(79) == 126479;
 
-        private HashSet<int> primes;
+        private HashSet<int> primes = null!;
 
         public override long Solve(long n)
         {

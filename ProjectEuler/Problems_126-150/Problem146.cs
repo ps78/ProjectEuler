@@ -22,9 +22,9 @@ namespace ProjectEuler
 
         public override bool Test() => Solve(1_000_000) == 1242490;
 
-        private SieveOfEratosthenes sieve;
-        private MillerRabinTest mrt;
-        private ulong[] primes;
+        private SieveOfEratosthenes sieve = null!;
+        private MillerRabinTest mrt = null!;
+        private ulong[] primes = null!;
 
         public static ulong[] Add =  { 1, 3, 7, 9, 13, 27 };
         public static ulong[] NotAdd = { 19, 21 };

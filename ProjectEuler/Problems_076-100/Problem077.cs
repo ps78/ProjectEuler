@@ -25,8 +25,8 @@ namespace ProjectEuler
     {
         public Problem077() : base(77, "Prime summations", 5000, 71) { }
 
-        private SieveOfEratosthenes sieve;
-        private List<ulong> primes;
+        private SieveOfEratosthenes sieve = null!;
+        private List<ulong> primes = null!;
 
         // first dic: 
         //   key = N, the number, for which partition counts are stored

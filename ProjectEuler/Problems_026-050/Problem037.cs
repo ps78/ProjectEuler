@@ -21,8 +21,8 @@ namespace ProjectEuler
     {
         public Problem037() : base(37, "Truncatable primes", 0, 748317) { }
 
-        SieveOfEratosthenes sieve;
-        MillerRabinTest mrt;
+        SieveOfEratosthenes sieve = null!;
+        MillerRabinTest mrt = null!;
 
         public override long Solve(long n)
         {

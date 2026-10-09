@@ -21,7 +21,7 @@ namespace ProjectEuler
     public class Problem051 : EulerProblemBase
     {
         public Problem051() : base(51, "Prime digit replacements", 0, 121313) { }
-        private SieveOfEratosthenes sieve;
+        private SieveOfEratosthenes sieve = null!;
 
         public override long Solve(long n)
         {
@@ -51,7 +51,7 @@ namespace ProjectEuler
             return 0; 
         }
 
-        private ulong[] Get8PrimeFamily(ulong p, byte[] substPos)
+        private ulong[]? Get8PrimeFamily(ulong p, byte[] substPos)
         {
             var s = new StringBuilder(p.ToString());
             int noPrimeCounter = 0;

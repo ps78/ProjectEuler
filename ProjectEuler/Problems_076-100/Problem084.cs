@@ -63,8 +63,8 @@ namespace ProjectEuler
         #region Fields
 
         private Random rand = new Random();
-        private List<CardActionDelegate> CommunityChest = new List<CardActionDelegate>();
-        private List<CardActionDelegate> Chance = new List<CardActionDelegate>();
+        private List<CardActionDelegate?> CommunityChest = new List<CardActionDelegate?>();
+        private List<CardActionDelegate?> Chance = new List<CardActionDelegate?>();
 
         #endregion
 
@@ -77,8 +77,8 @@ namespace ProjectEuler
         public override long Solve(long n)
         {
             var board = new long[40];
-            CommunityChest.AddRange(new CardActionDelegate[16] { AdvanceToGo, GoToJail, null, null, null, null, null, null, null, null, null, null, null, null, null, null });
-            Chance.AddRange(new CardActionDelegate[16] { AdvanceToGo, GoToJail, GoToC1, GoToE3, GoToH2, GoToR1, GoToNextRailway, GoToNextRailway, GoToNextUtility, GoBack3, null, null, null, null, null, null });
+            CommunityChest.AddRange(new CardActionDelegate?[16] { AdvanceToGo, GoToJail, null, null, null, null, null, null, null, null, null, null, null, null, null, null });
+            Chance.AddRange(new CardActionDelegate?[16] { AdvanceToGo, GoToJail, GoToC1, GoToE3, GoToH2, GoToR1, GoToNextRailway, GoToNextRailway, GoToNextUtility, GoBack3, null, null, null, null, null, null });
 
             CommunityChest.Shuffle();
             Chance.Shuffle();

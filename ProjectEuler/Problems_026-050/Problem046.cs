@@ -24,7 +24,7 @@ namespace ProjectEuler
     {
         public Problem046() : base(46, "Goldbach's other conjecture", 0, 5777) { }
 
-        private SieveOfEratosthenes sieve;
+        private SieveOfEratosthenes sieve = null!;
 
         public override long Solve(long n)
         {

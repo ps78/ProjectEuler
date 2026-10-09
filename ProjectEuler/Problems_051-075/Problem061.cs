@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using NumberTheory;
 using System.IO;
 using System.Numerics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ProjectEuler
 {
@@ -123,8 +124,8 @@ namespace ProjectEuler
             }
         }
 
-        private void FindCyclicSeries(Dictionary<int, PolySeries> series, ref bool[]? seriesUsed, ref PolyNumber?[]? intermediateResult, 
-                                      int numsFixed, ref List<PolyNumber[]>? result)
+        private void FindCyclicSeries(Dictionary<int, PolySeries> series, [NotNull] ref bool[]? seriesUsed, [NotNull] ref PolyNumber?[]? intermediateResult, 
+                                      int numsFixed, [NotNull] ref List<PolyNumber[]>? result)
         {
             if (result == null)
                 result = new List<PolyNumber[]>();

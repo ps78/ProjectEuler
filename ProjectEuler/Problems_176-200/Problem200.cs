@@ -26,8 +26,8 @@ namespace ProjectEuler
 
         public override bool Test() => Solve(2) == 1992008;
 
-        private SieveOfEratosthenes sieve;
-        private MillerRabinTest mr;
+        private SieveOfEratosthenes sieve = null!;
+        private MillerRabinTest mr = null!;
         private Dictionary<ulong, (ulong, ulong)> squbes = new Dictionary<ulong, (ulong, ulong)>();
         private ulong max_q; // largest q used so far to generate squbes
 

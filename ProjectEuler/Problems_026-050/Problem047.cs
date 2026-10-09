@@ -28,7 +28,7 @@ namespace ProjectEuler
     {
         public Problem047() : base(47, "Distinct primes factors", 4, 134043) { }
         
-        private SieveOfEratosthenes sieve;
+        private SieveOfEratosthenes sieve = null!;
 
         public override bool Test() => Solve(2) == 14 && Solve(3) == 644;
 

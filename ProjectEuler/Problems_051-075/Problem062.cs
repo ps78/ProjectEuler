@@ -30,7 +30,7 @@ namespace ProjectEuler
             int PermutationCount = (int)n;
 
             var cubeDic = new Dictionary<string, HashSet<ulong>>();
-            HashSet<ulong> solution = null;
+            HashSet<ulong>? solution = null;
             while (true)
             {
                 ulong cube = m * m * m;
@@ -78,7 +78,7 @@ namespace ProjectEuler
             {
                 if (sb.Length > 0)
                     sb.Append(", ");
-                sb.Append(el.ToString());
+                sb.Append(el?.ToString());
             }
             return "{" + sb.ToString() + "}";
         }

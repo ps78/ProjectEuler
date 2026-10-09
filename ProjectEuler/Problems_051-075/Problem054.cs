@@ -98,9 +98,9 @@ namespace ProjectEuler
                 }
             }
 
-            public int CompareTo(Card other)
+            public int CompareTo(Card? other)
             {
-                return Value.CompareTo(other.Value);
+                return other is null ? 1 : Value.CompareTo(other.Value);
             }
             public override string ToString()
             {
@@ -116,7 +116,7 @@ namespace ProjectEuler
         {
             private Card[] cards = new Card[5];
 
-            private CardValue[]? HighestValues = null;
+            private CardValue[] HighestValues = [];
 
             public PokerHands Hand { get; private set; }
             
@@ -199,8 +199,10 @@ namespace ProjectEuler
                 }
             }
 
-            public int CompareTo(PokerHand other)
+            public int CompareTo(PokerHand? other)
             {
+                if (other is null)
+                    return 1;
                 if (this.Hand == other.Hand)
                 {
                     for (int i = 0; i < HighestValues.Length; i++)

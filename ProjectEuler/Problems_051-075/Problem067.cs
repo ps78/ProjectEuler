@@ -40,8 +40,8 @@ namespace ProjectEuler
             return best;
         }
 
-        private int[] data;
-        private int[] heuristic;
+        private int[] data = null!;
+        private int[] heuristic = null!;
         private int RowCount;
 
         /// <summary>

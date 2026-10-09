@@ -167,7 +167,7 @@ namespace ProjectEuler
         #endregion
         #region Fields
 
-        private WordCollection WordList;
+        private WordCollection WordList = null!;
 
         #endregion        
         #region Static helper Methods

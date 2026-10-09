@@ -25,10 +25,10 @@ namespace ProjectEuler
     {
         public Problem060() : base(60, "Prime pair sets", 0, 26033) { }
 
-        private SieveOfEratosthenes sieve;
+        private SieveOfEratosthenes sieve = null!;
         public const ulong SieveLimit = 10_000_000; // this can be set lower or higher, 10 mio seems to be a good value.
-        private ulong[] prm;        // list of consequtive primes from 3 to maxPrime, without 5
-        private ulong[] prmSqr;      // squares of the primes, use for fast prime test
+        private ulong[] prm = null!;        // list of consequtive primes from 3 to maxPrime, without 5
+        private ulong[] prmSqr = null!;      // squares of the primes, use for fast prime test
 
         public override long Solve(long n)
         {

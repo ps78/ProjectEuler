@@ -33,9 +33,9 @@ namespace ProjectEuler
 
         public override bool Test() => Solve(5) == 28;
 
-        private SieveOfEratosthenes sieve;
-        private ulong[] primes;
-        private Dictionary<ulong, ulong> divCounts;
+        private SieveOfEratosthenes sieve = null!;
+        private ulong[] primes = null!;
+        private Dictionary<ulong, ulong> divCounts = null!;
 
         public override long Solve(long n)
         {

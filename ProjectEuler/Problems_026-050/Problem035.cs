@@ -21,7 +21,7 @@ namespace ProjectEuler
 
         public override bool Test() => Solve(100) == 13;
 
-        private SieveOfEratosthenes Sieve;
+        private SieveOfEratosthenes Sieve = null!;
 
         public override long Solve(long n)
         {

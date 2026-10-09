@@ -38,7 +38,7 @@ namespace ProjectEuler
             {
                 var interfaceType = typeof(IEulerProblem);
                 types.AddRange(AppDomain.CurrentDomain.GetAssemblies()
-                    .Where(a => a.FullName.StartsWith("ProjectEuler,"))
+                    .Where(a => a.FullName != null && a.FullName.StartsWith("ProjectEuler,"))
                     .SelectMany(s => s.GetTypes())
                     .Where(p => interfaceType.IsAssignableFrom(p) && !p.IsInterface));
             }
@@ -56,10 +56,10 @@ namespace ProjectEuler
 
             foreach (var type in types.OrderBy(t => t.Name))
             {
-                IEulerProblem instance = null;
+                IEulerProblem? instance = null;
                 try
                 {                    
-                    instance = (IEulerProblem)Activator.CreateInstance(type);
+                    instance = (IEulerProblem?)Activator.CreateInstance(type);
                 }
                 catch
                 {
@@ -130,7 +130,8 @@ namespace ProjectEuler
             Console.WriteLine("---------------------------------------------------------------------------------------------------------------");
             Console.WriteLine($"Total solution time             : {totalRunTime / 1000,10:N1} sec");
             Console.WriteLine($"Average runtime per problem     : {totalRunTime / problems.Count,10:N1} ms");
-            Console.WriteLine($"Problem{slowestProblem.ProblemNumber,3:D3} took longest         : {longestRuntime.TotalMilliseconds,10:N1} ms");
+            if (slowestProblem != null)
+                Console.WriteLine($"Problem{slowestProblem.ProblemNumber,3:D3} took longest         : {longestRuntime.TotalMilliseconds,10:N1} ms");
             Console.WriteLine($"Number of tests failed          : {testsFailed,10}");
             Console.WriteLine($"Number of wrong solutions       : {wrongSolutions,10}");            
         }
